@@ -1,0 +1,175 @@
+@import '../../styles/theme.css';
+
+/* Resident Finances List Page Styles */
+.finances-container {
+  padding: 24px 24px 24px 0; /* Reduced left padding */
+  background-color: var(--light-bg);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.finances-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24px;
+  position: relative;
+  padding-left: 24px; /* Add left padding to header only */
+}
+
+.finances-header-title {
+  flex-grow: 1;
+  font-weight: 700;
+  position: relative;
+}
+
+.finances-header-title::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  width: 60px;
+  height: 4px;
+  background: var(--primary-color);
+  border-radius: 2px;
+}
+
+.filters-container {
+  margin-bottom: 24px;
+  padding: 20px;
+  background-color: white;
+  border-radius: var(--border-radius);
+  box-shadow: var(--card-shadow);
+}
+
+.summary-card {
+  height: 100%;
+  padding: 24px;
+  text-align: center;
+  background-color: white;
+  border-radius: var(--border-radius);
+  box-shadow: var(--card-shadow);
+  transition: var(--transition);
+}
+
+.summary-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+}
+
+.summary-amount {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 12px 0;
+  background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.summary-label {
+  color: var(--text-secondary);
+  font-size: 1rem;
+  font-weight: 500;
+  margin-top: 8px;
+}
+
+.status-pending {
+  background-color: rgba(var(--warning-rgb, 255, 190, 11), 0.15);
+  color: var(--warning, #ffbe0b);
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  display: inline-block;
+}
+
+.status-paid {
+  background-color: rgba(var(--success-rgb, 56, 176, 0), 0.15);
+  color: var(--success, #38b000);
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  display: inline-block;
+}
+
+.status-overdue {
+  background-color: rgba(var(--danger-rgb, 255, 0, 110), 0.15);
+  color: var(--danger, #ff006e);
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  display: inline-block;
+}
+
+.status-partial {
+  background-color: rgba(var(--info-rgb, 58, 134, 255), 0.15);
+  color: var(--info, #3a86ff);
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  display: inline-block;
+}
+
+.table-container {
+  margin-top: 24px;
+  overflow-x: auto;
+  background-color: white;
+  border-radius: var(--border-radius);
+  box-shadow: var(--card-shadow);
+}
+
+.table-container table {
+  min-width: 650px;
+}
+
+.table-container th {
+  font-weight: 600;
+  background-color: rgba(var(--primary-rgb, 58, 134, 255), 0.05);
+}
+
+.table-container tbody tr:hover {
+  background-color: rgba(var(--primary-rgb, 58, 134, 255), 0.03);
+}
+
+.table-actions {
+  white-space: nowrap;
+}
+
+.table-actions .MuiIconButton-root {
+  margin: 0 4px;
+  transition: var(--transition);
+}
+
+.table-actions .MuiIconButton-root:hover {
+  background-color: rgba(var(--primary-rgb, 58, 134, 255), 0.1);
+}
+
+.table-date {
+  white-space: nowrap;
+  font-family: monospace;
+}
+
+.no-records {
+  text-align: center;
+  padding: 40px;
+  color: var(--text-secondary);
+}
+
+.finance-action-button {
+  border-radius: var(--border-radius);
+  text-transform: none;
+  font-weight: 500;
+  transition: var(--transition);
+}
+
+.search-field {
+  border-radius: var(--border-radius);
+  transition: var(--transition);
+}
+
+.search-field:focus {
+  border-color: var(--primary-color);
+}

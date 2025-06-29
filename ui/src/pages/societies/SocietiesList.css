@@ -1,0 +1,77 @@
+/* Societies List Page Styles */
+@import '../../styles/theme.css';
+
+.societies-container {
+  padding: 24px 24px 24px 0; /* Reduced left padding */
+  background-color: var(--light-bg);
+  min-height: 100vh;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.societies-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 32px;
+  position: relative;
+  padding-left: 24px; /* Add left padding to header only */
+}
+
+.societies-header-title {
+  flex-grow: 1;
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  position: relative;
+}
+
+.societies-header-title::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  width: 60px;
+  height: 4px;
+  background: var(--primary-color);
+  border-radius: 2px;
+}
+
+.societies-filters {
+  margin-bottom: 24px;
+  padding: 24px;
+  background-color: white;
+  border-radius: var(--border-radius);
+  box-shadow: var(--card-shadow);
+}
+
+.society-card {
+  height: 100%;
+  border-radius: var(--border-radius);
+  box-shadow: var(--card-shadow);
+  transition: var(--transition);
+  overflow: hidden;
+  border-left: 4px solid var(--secondary-color);
+}
+
+.society-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+}
+
+.society-stats {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 12px;
+}
+
+.society-stat-item {
+  text-align: center;
+  padding: 8px 12px;
+  background-color: var(--light-bg);
+  border-radius: var(--border-radius);
+}
+
+.no-societies {
+  text-align: center;
+  padding: 2rem;
+}

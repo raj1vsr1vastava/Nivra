@@ -1,0 +1,184 @@
+/* Import theme variables */
+@import './styles/theme.css';
+
+/* App Container */
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Material UI Overrides */
+.MuiContainer-root {
+  width: 100% !important;
+  max-width: 1200px !important;
+  padding-left: var(--space-6) !important;
+  padding-right: var(--space-6) !important;
+  box-sizing: border-box !important;
+  margin: 0 auto !important;
+}
+
+@media (max-width: 768px) {
+  .MuiContainer-root {
+    padding-left: var(--space-4) !important;
+    padding-right: var(--space-4) !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .MuiContainer-root {
+    padding-left: var(--space-3) !important;
+    padding-right: var(--space-3) !important;
+  }
+}
+
+/* Material UI Component Overrides */
+.MuiCard-root {
+  box-shadow: var(--shadow-sm) !important;
+  border-radius: var(--radius-xl) !important;
+  transition: all var(--transition-normal) !important;
+  border: 1px solid var(--color-border-light) !important;
+  background-color: var(--color-card) !important;
+  overflow: hidden !important;
+}
+
+.MuiCard-root:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg) !important;
+  border-color: var(--color-border) !important;
+}
+
+.MuiButton-root {
+  font-family: var(--font-family-sans) !important;
+  font-weight: var(--font-weight-medium) !important;
+  border-radius: var(--radius-lg) !important;
+  text-transform: none !important;
+  transition: all var(--transition-fast) !important;
+  padding: var(--space-2) var(--space-5) !important;
+}
+
+.MuiButton-contained {
+  background-color: var(--color-primary) !important;
+  color: var(--color-text-inverse) !important;
+}
+
+.MuiButton-contained:hover {
+  background-color: var(--color-primary-dark) !important;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md) !important;
+}
+
+.MuiButton-outlined {
+  border-color: var(--color-primary) !important;
+  color: var(--color-primary) !important;
+}
+
+.MuiButton-outlined:hover {
+  background-color: rgba(14, 165, 233, 0.05) !important;
+}
+
+.MuiPaper-root {
+  border-radius: var(--radius-xl) !important;
+  box-shadow: var(--shadow-sm) !important;
+  background-color: var(--color-card) !important;
+}
+
+/* Typography Overrides */
+.MuiTypography-root {
+  font-family: var(--font-family-sans) !important;
+  color: var(--color-text-primary) !important;
+}
+
+.MuiTypography-h1, 
+.MuiTypography-h2, 
+.MuiTypography-h3, 
+.MuiTypography-h4, 
+.MuiTypography-h5, 
+.MuiTypography-h6 {
+  font-weight: var(--font-weight-bold) !important;
+  line-height: var(--line-height-tight) !important;
+}
+
+/* Form Controls Overrides */
+.MuiInputBase-root {
+  font-family: var(--font-family-sans) !important;
+  border-radius: var(--radius-md) !important;
+  transition: all var(--transition-fast) !important;
+}
+
+.MuiInputBase-input {
+  padding: var(--space-3) var(--space-4) !important;
+  color: var(--color-text-primary) !important;
+}
+
+.MuiInputLabel-root {
+  color: var(--color-text-secondary) !important;
+  font-family: var(--font-family-sans) !important;
+}
+
+.MuiSelect-select {
+  padding: var(--space-3) var(--space-4) !important;
+}
+
+/* Table Overrides */
+.MuiTableContainer-root {
+  border-radius: var(--radius-xl) !important;
+  box-shadow: var(--shadow-sm) !important;
+  border: 1px solid var(--color-border-light) !important;
+  overflow: hidden !important;
+  margin-bottom: var(--space-6) !important;
+}
+
+.MuiTableHead-root {
+  background-color: var(--color-background-secondary) !important;
+}
+
+.MuiTableCell-head {
+  font-weight: var(--font-weight-semibold) !important;
+  color: var(--color-text-primary) !important;
+  border-bottom: 1px solid var(--color-border) !important;
+}
+
+.MuiTableCell-body {
+  border-bottom: 1px solid var(--color-border-light) !important;
+}
+
+.MuiTableRow-root:hover {
+  background-color: var(--color-background-tertiary) !important;
+}
+
+/* Dialog Overrides */
+.MuiDialog-paper {
+  border-radius: var(--radius-xl) !important;
+  box-shadow: var(--shadow-lg) !important;
+  overflow: hidden !important;
+}
+
+.MuiDialogTitle-root {
+  background-color: var(--color-background-secondary) !important;
+  padding: var(--space-4) var(--space-6) !important;
+}
+
+/* Links */
+a {
+  text-decoration: none;
+  color: var(--color-primary);
+  transition: color var(--transition-fast);
+}
+
+a:hover {
+  color: var(--color-primary-dark);
+  text-decoration: none;
+}
+
+/* Main Content Area */
+.main-content {
+  flex: 1;
+  width: 100%;
+  position: relative;
+}
+
+/* Ensures minimal page height */
+.min-height-page {
+  min-height: calc(100vh - 160px);
+}

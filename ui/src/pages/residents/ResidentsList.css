@@ -1,0 +1,103 @@
+/* Residents List Page Styles */
+@import '../../styles/theme.css';
+
+.residents-container {
+  padding: 24px 24px 24px 0; /* Reduced left padding */
+  background-color: var(--light-bg);
+  min-height: 100vh;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.residents-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 32px;
+  position: relative;
+  padding-left: 24px; /* Add left padding to header only */
+}
+
+.residents-header-title {
+  flex-grow: 1;
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  position: relative;
+}
+
+.residents-header-title::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  width: 60px;
+  height: 4px;
+  background: var(--primary-color);
+  border-radius: 2px;
+}
+
+.residents-filters {
+  margin-bottom: 24px;
+  margin-left: 24px; /* Add left margin to align with header */
+  margin-right: 24px; /* Add right margin for symmetry */
+  padding: 24px;
+  background-color: white;
+  border-radius: var(--border-radius);
+  box-shadow: var(--card-shadow);
+}
+
+.resident-card {
+  height: 100%;
+  border-radius: var(--border-radius);
+  box-shadow: var(--card-shadow);
+  transition: var(--transition);
+  overflow: hidden;
+  border-top: 4px solid var(--primary-color);
+}
+
+.resident-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+}
+
+.resident-card-content {
+  padding: 20px;
+}
+
+.resident-name {
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.resident-card-header {
+  padding: 1rem 1rem 0.5rem;
+  display: flex;
+  align-items: center;
+}
+
+.resident-avatar {
+  margin-right: 0.75rem;
+  background-color: #2196f3;
+}
+
+.resident-card-content {
+  padding-top: 0;
+}
+
+.resident-info-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.resident-info-icon {
+  margin-right: 0.5rem;
+  font-size: 1.2rem;
+  color: #666;
+}
+
+.no-residents {
+  text-align: center;
+  padding: 2rem;
+}

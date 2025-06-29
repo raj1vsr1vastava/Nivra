@@ -1,0 +1,104 @@
+@import '../../styles/theme.css';
+
+/* Settings Page */
+.settings-management-container {
+  padding: 24px 24px 24px 0; /* Reduced left padding */
+  background-color: var(--light-bg);
+  min-height: 100vh;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Settings Page Header */
+.settings-management-header {
+  margin-bottom: 32px;
+  padding-left: 24px; /* Add left padding to header only */
+}
+
+.settings-management-header h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: var(--text-primary);
+  position: relative;
+}
+
+.settings-management-header h1::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  width: 60px;
+  height: 4px;
+  background: var(--primary-color);
+  border-radius: 2px;
+}
+
+/* Settings Content Panel */
+.settings-management-panel {
+  background-color: white;
+  border-radius: var(--border-radius);
+  box-shadow: var(--card-shadow);
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+/* Data Table */
+.settings-data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.settings-data-table th {
+  background-color: rgba(var(--primary-rgb), 0.05);
+  font-weight: 600;
+  text-align: left;
+  padding: 12px;
+}
+
+.settings-data-table td {
+  padding: 12px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.settings-data-table tr:last-child td {
+  border-bottom: none;
+}
+
+.settings-data-table tr:hover {
+  background-color: rgba(var(--primary-rgb), 0.03);
+}
+
+/* Form Controls */
+.settings-form-control {
+  margin-bottom: 16px;
+}
+
+.settings-form-field {
+  width: 100%;
+  border-radius: var(--border-radius);
+}
+
+/* Action Buttons */
+.settings-action-button {
+  margin-right: 8px;
+  border-radius: var(--border-radius);
+  text-transform: none;
+  font-weight: 500;
+  transition: var(--transition);
+}
+
+/* Search Bar */
+.settings-search-bar {
+  margin-bottom: 20px;
+  display: flex;
+  gap: 16px;
+}
+
+/* Filters */
+.settings-filters {
+  margin-bottom: 20px;
+  padding: 16px;
+  background-color: rgba(var(--primary-rgb), 0.03);
+  border-radius: var(--border-radius);
+}
