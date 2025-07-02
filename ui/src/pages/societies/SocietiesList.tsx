@@ -256,22 +256,16 @@ const SocietiesList: React.FC = () => {
             </Box>
             {/* Removed society count display */}
             <Button 
-              className="modern-button"
-              variant="contained"
+              variant="contained" 
+              color="primary" 
+              startIcon={<AddIcon />}
+              onClick={handleOpenDialog}
               sx={{ 
-                background: 'linear-gradient(45deg, var(--primary-color), var(--secondary-color))',
-                fontWeight: 600,
-                height: '40px',
                 order: { xs: 1, md: 3 },
                 width: { xs: '100%', md: 'auto' },
                 ml: { xs: 0, md: 1 },
-                '&:hover': {
-                  background: 'linear-gradient(45deg, var(--secondary-color), var(--primary-color))',
-                  transform: 'translateY(-2px)'
-                }
+                height: '40px',
               }}
-              startIcon={<AddIcon />}
-              onClick={handleOpenDialog}
             >
               Add Society
             </Button>
@@ -301,7 +295,7 @@ const SocietiesList: React.FC = () => {
             sm: 'repeat(auto-fill, minmax(260px, 1fr))',
             md: 'repeat(auto-fill, minmax(280px, 1fr))' 
           }, 
-          gap: { xs: 2, sm: 3, md: 4 }, /* Increased gaps for better spacing */
+          gap: { xs: 1, sm: 2, md: 2 }, /* Reduced gaps for better spacing */
           mt: 3, /* Increased margin top for better spacing */
           px: 1 /* Added horizontal padding to the grid */
         }}>
@@ -545,12 +539,6 @@ const SocietiesList: React.FC = () => {
               !newSociety.total_units || 
               newSociety.total_units <= 0
             }
-            sx={{
-              background: 'linear-gradient(45deg, var(--primary-color), var(--secondary-color))',
-              '&:hover': {
-                background: 'linear-gradient(45deg, var(--secondary-color), var(--primary-color))',
-              }
-            }}
           >
             Create Society
           </Button>

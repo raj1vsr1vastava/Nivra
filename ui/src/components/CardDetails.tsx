@@ -214,13 +214,8 @@ const CardDetails: React.FC<CardProps> = ({
                 disabled={action.disabled}
                 sx={{ 
                   ...(action.variant === 'contained' ? {
-                    background: 'linear-gradient(45deg, var(--primary-color), var(--secondary-color))',
                     color: 'white',
-                    fontWeight: 600,
-                    '&:hover': {
-                      background: 'linear-gradient(45deg, var(--secondary-color), var(--primary-color))',
-                      transform: 'translateY(-2px)'
-                    }
+                    fontWeight: 500
                   } : {
                     color: 'var(--text-secondary)',
                     fontWeight: 500,
