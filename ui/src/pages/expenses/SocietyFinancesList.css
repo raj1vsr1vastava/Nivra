@@ -40,15 +40,11 @@
   position: relative;
 }
 
-.finances-header h1::after {
-  content: '';
-  position: absolute;
-  bottom: -8px;
-  left: 0;
-  width: 60px;
-  height: 4px;
-  background: var(--primary-color);
-  border-radius: 2px;
+/* Removed blue underline from title */
+
+/* Override section-title underline for this page */
+.society-finances-container .section-title::after {
+  display: none; /* Remove the red underline */
 }
 
 .finances-summary {

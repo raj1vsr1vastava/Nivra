@@ -1,0 +1,62 @@
+.resident-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+}
+
+.resident-info-section {
+  margin-bottom: 24px;
+}
+
+.resident-info-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.resident-info-icon {
+  margin-right: 8px;
+  color: var(--text-secondary);
+}
+
+.transaction-status {
+  margin-left: 8px;
+  font-size: 0.75rem;
+  font-weight: 400;
+  padding: 2px 6px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.transaction-status-paid {
+  background-color: rgba(var(--success-rgb), 0.1);
+  color: var(--success);
+}
+
+.transaction-status-overdue {
+  background-color: rgba(var(--error-rgb), 0.1);
+  color: var(--error);
+}
+
+.transaction-status-pending {
+  background-color: rgba(var(--warning-rgb), 0.1);
+  color: var(--warning);
+}
+
+.financial-summary-card {
+  border-radius: var(--border-radius);
+  padding: 16px;
+  height: 100%;
+  box-shadow: var(--card-shadow);
+}
+
+@media (max-width: 600px) {
+  .resident-detail-header {
+    flex-direction: column;
+  }
+  
+  .resident-detail-header button {
+    margin-top: 16px;
+  }
+}

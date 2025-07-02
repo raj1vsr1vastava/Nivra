@@ -11,24 +11,24 @@
 /* Material UI Overrides */
 .MuiContainer-root {
   width: 100% !important;
-  max-width: 1200px !important;
-  padding-left: var(--space-6) !important;
-  padding-right: var(--space-6) !important;
+  max-width: 1400px !important; /* Increased from 1200px */
+  padding-left: var(--space-1) !important; /* Reduced from space-6 */
+  padding-right: var(--space-1) !important; /* Reduced from space-6 */
   box-sizing: border-box !important;
   margin: 0 auto !important;
 }
 
 @media (max-width: 768px) {
   .MuiContainer-root {
-    padding-left: var(--space-4) !important;
-    padding-right: var(--space-4) !important;
+    padding-left: var(--space-1) !important; /* Reduced from space-4 */
+    padding-right: var(--space-1) !important; /* Reduced from space-4 */
   }
 }
 
 @media (max-width: 480px) {
   .MuiContainer-root {
-    padding-left: var(--space-3) !important;
-    padding-right: var(--space-3) !important;
+    padding-left: var(--space-1) !important; /* Reduced from space-3 */
+    padding-right: var(--space-1) !important; /* Reduced from space-3 */
   }
 }
 

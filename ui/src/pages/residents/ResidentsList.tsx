@@ -1,19 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   Container, 
   Typography, 
-  Grid, 
   CircularProgress, 
   Box, 
   Alert, 
   TextField,
   Button,
-  Paper,
-  Card,
-  CardContent,
-  CardActions,
-  Avatar,
-  Divider,
   FormControl,
   InputLabel,
   Select,
@@ -24,84 +18,58 @@ import {
   DialogTitle,
   FormHelperText,
   Switch,
-  FormControlLabel
+  FormControlLabel,
+  SelectChangeEvent
 } from '@mui/material';
 import { residentService, societyService } from '../../services';
 import AddIcon from '@mui/icons-material/Add';
 import SearchIcon from '@mui/icons-material/Search';
-import HomeIcon from '@mui/icons-material/Home';
-import PersonIcon from '@mui/icons-material/Person';
 import EmailIcon from '@mui/icons-material/Email';
 import PhoneIcon from '@mui/icons-material/Phone';
+import Grid from '../../components/shared/Grid';
+import { SocietyData } from '../../types';
 import './ResidentsList.css';
+import CardList from '../../components/CardList';
 
-// Resident Card Component
-const ResidentCard = ({ resident }) => {
-  const fullName = `${resident.first_name} ${resident.last_name}`;
-  
-  return (
-    <Card className="resident-card">
-      <Box className="resident-card-header">
-        <Avatar className="resident-avatar">
-          {resident.first_name ? resident.first_name[0].toUpperCase() : 'R'}
-        </Avatar>
-        <Typography variant="h6" component="div">
-          {fullName}
-        </Typography>
-      </Box>
-      
-      <CardContent className="resident-card-content">
-        <Box className="resident-info-item">
-          <HomeIcon className="resident-info-icon" fontSize="small" />
-          <Typography variant="body2" color="text.secondary">
-            Unit: {resident.unit_number}
-          </Typography>
-        </Box>
-        
-        <Box className="resident-info-item">
-          <PersonIcon className="resident-info-icon" fontSize="small" />
-          <Typography variant="body2" color="text.secondary">
-            {resident.is_owner ? 'Owner' : 'Tenant'} 
-            {resident.is_committee_member && ' | Committee Member'}
-            {resident.committee_role && ` - ${resident.committee_role}`}
-          </Typography>
-        </Box>
-        
-        <Divider sx={{ my: 1 }} />
-        
-        <Box className="resident-info-item">
-          <EmailIcon className="resident-info-icon" fontSize="small" />
-          <Typography variant="body2" color="text.secondary" noWrap>
-            {resident.email || 'No email provided'}
-          </Typography>
-        </Box>
-        
-        <Box className="resident-info-item">
-          <PhoneIcon className="resident-info-icon" fontSize="small" />
-          <Typography variant="body2" color="text.secondary">
-            {resident.phone || 'No phone provided'}
-          </Typography>
-        </Box>
-      </CardContent>
-      <CardActions>
-        <Button size="small" color="primary">View Details</Button>
-        <Button size="small" color="primary">Edit</Button>
-      </CardActions>
-    </Card>
-  );
-};
+// Extend the ResidentData interface from existing types
+interface Resident {
+  id: string | number;
+  first_name: string;
+  last_name: string;
+  email?: string;
+  phone?: string;
+  unit_number?: string;
+  society_id: string | number;
+  is_owner: boolean;
+  is_committee_member: boolean;
+  committee_role?: string;
+  is_active: boolean;
+}
 
-const ResidentsList = () => {
-  const [residents, setResidents] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedSociety, setSelectedSociety] = useState(null);
+// Field errors interface
+interface FieldErrors {
+  first_name?: string;
+  last_name?: string;
+  email?: string;
+  phone?: string;
+  unit_number?: string;
+  society_id?: string;
+  committee_role?: string;
+}
+
+const ResidentsList: React.FC = () => {
+  const navigate = useNavigate();
+  const [residents, setResidents] = useState<Resident[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState<string>('');
+  const [selectedSociety, setSelectedSociety] = useState<string | number | null>(null);
   // Dialog state
-  const [openDialog, setOpenDialog] = useState(false);
-  const [dialogError, setDialogError] = useState('');
-  const [fieldErrors, setFieldErrors] = useState({});
-  const [newResident, setNewResident] = useState({
+  const [openDialog, setOpenDialog] = useState<boolean>(false);
+  const [dialogError, setDialogError] = useState<string>('');
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
+  const [newResident, setNewResident] = useState<Resident>({
+    id: '', // This will be assigned by the backend
     first_name: '',
     last_name: '',
     email: '',
@@ -114,15 +82,32 @@ const ResidentsList = () => {
     is_active: true
   });
 
+  // Need to add the societies state and fetch
+  const [societies, setSocieties] = useState<SocietyData[]>([]);
+
   useEffect(() => {
     fetchResidents();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedSociety]);
 
-  const fetchResidents = async () => {
+  // Fetch societies for the dropdown
+  useEffect(() => {
+    const fetchSocieties = async (): Promise<void> => {
+      try {
+        const data = await societyService.getAllSocieties();
+        setSocieties(data);
+      } catch (err) {
+        console.error('Error fetching societies:', err);
+      }
+    };
+    
+    fetchSocieties();
+  }, []);
+
+  const fetchResidents = async (): Promise<void> => {
     try {
       setLoading(true);
-      let data;
+      let data: Resident[];
       
       if (selectedSociety) {
         // Fetch residents for specific society
@@ -144,31 +129,15 @@ const ResidentsList = () => {
 
   const filteredResidents = residents.filter(resident => {
     const fullName = `${resident.first_name} ${resident.last_name}`.toLowerCase();
+    const searchLowerCase = searchTerm.toLowerCase();
     
-    return fullName.includes(searchTerm.toLowerCase()) ||
-      resident.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      resident.unit_number?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      resident.committee_role?.toLowerCase().includes(searchTerm.toLowerCase());
+    return fullName.includes(searchLowerCase) ||
+      resident.email?.toLowerCase().includes(searchLowerCase) ||
+      resident.unit_number?.toLowerCase().includes(searchLowerCase) ||
+      resident.committee_role?.toLowerCase().includes(searchLowerCase);
   });
-
-  // Need to add the societies state and fetch
-  const [societies, setSocieties] = useState([]);
   
-  // Fetch societies for the dropdown
-  useEffect(() => {
-    const fetchSocieties = async () => {
-      try {
-        const data = await societyService.getAllSocieties();
-        setSocieties(data);
-      } catch (err) {
-        console.error('Error fetching societies:', err);
-      }
-    };
-    
-    fetchSocieties();
-  }, []);
-  
-  const handleOpenDialog = () => {
+  const handleOpenDialog = (): void => {
     setOpenDialog(true);
     // Default to the currently selected society if one is selected
     if (selectedSociety) {
@@ -176,9 +145,10 @@ const ResidentsList = () => {
     }
   };
 
-  const handleCloseDialog = () => {
+  const handleCloseDialog = (): void => {
     setOpenDialog(false);
     setNewResident({
+      id: '',
       first_name: '',
       last_name: '',
       email: '',
@@ -194,24 +164,29 @@ const ResidentsList = () => {
     setFieldErrors({});
   };
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
     const { name, value } = e.target;
-    setNewResident({ ...newResident, [name]: value });
+    setNewResident(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSwitchChange = (e) => {
+  const handleSelectChange = (e: SelectChangeEvent<string>): void => {
+    const { name, value } = e.target;
+    setNewResident(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSwitchChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const { name, checked } = e.target;
-    setNewResident({ ...newResident, [name]: checked });
+    setNewResident(prev => ({ ...prev, [name]: checked }));
   };
 
-  const handleCreateResident = async () => {
+  const handleCreateResident = async (): Promise<void> => {
     try {
       setDialogError('');
       setFieldErrors({});
       
       // Validate required fields
       if (!newResident.first_name || !newResident.last_name || !newResident.society_id) {
-        const errors = {};
+        const errors: FieldErrors = {};
         if (!newResident.first_name) errors.first_name = 'First name is required';
         if (!newResident.last_name) errors.last_name = 'Last name is required';
         if (!newResident.society_id) errors.society_id = 'Society is required';
@@ -226,7 +201,7 @@ const ResidentsList = () => {
       // Refresh residents list and close dialog
       fetchResidents();
       handleCloseDialog();
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error creating resident:', err);
       
       // Handle field-specific errors
@@ -241,61 +216,91 @@ const ResidentsList = () => {
   };
   
   return (
-    <Container maxWidth="lg" className="residents-container">
-      <Box className="residents-header">
-        <Typography variant="h4" component="h1" className="residents-header-title">
-          Residents
-        </Typography>
-        <Button 
-          variant="contained" 
-          color="primary" 
-          startIcon={<AddIcon />}
-          onClick={handleOpenDialog}
-        >
-          Add Resident
-        </Button>
-      </Box>
-      
-      <Paper className="residents-filters">
-        <Grid container spacing={2} alignItems="center" p={2}>
-          <Grid item xs={12} md={4}>
-            <TextField
-              fullWidth
-              placeholder="Search residents by name, email, unit number..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              InputProps={{
-                startAdornment: <SearchIcon color="action" sx={{ mr: 1 }} />,
+    <div className="residents-container">
+      <Container maxWidth="xl" sx={{ px: { xs: 1, sm: 2, md: 3 } /* Increased padding for better spacing */ }}>
+        <div className="residents-header">
+          <h1 className="residents-header-title">
+            Residents
+          </h1>
+          <Box sx={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: { xs: 1, md: 2 },
+            flexWrap: { xs: 'wrap', md: 'nowrap' },
+            width: { xs: '100%', md: 'auto' }
+          }}>
+            <Box sx={{ 
+              display: 'flex',
+              flexGrow: 1, 
+              maxWidth: { xs: '100%', md: '300px' },
+              minWidth: { xs: '100%', md: '200px' },
+              order: { xs: 2, md: 1 }
+            }}>
+              <TextField
+                className="search-field"
+                fullWidth
+                placeholder="Search residents..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                InputProps={{
+                  startAdornment: <SearchIcon color="action" sx={{ mr: 0.5 }} />,
+                  sx: { 
+                    borderRadius: 'var(--border-radius)',
+                    height: '40px',
+                    fontSize: '0.875rem'
+                  }
+                }}
+                variant="outlined"
+                size="small"
+              />
+            </Box>
+            <Box sx={{ 
+              display: 'flex',
+              flexGrow: 1, 
+              maxWidth: { xs: '100%', md: '250px' },
+              minWidth: { xs: '100%', md: '200px' },
+              order: { xs: 3, md: 2 }
+            }}>
+              <FormControl fullWidth size="small" sx={{ height: '40px' }}>
+                <InputLabel id="society-select-label">Filter by Society</InputLabel>
+                <Select
+                  labelId="society-select-label"
+                  value={selectedSociety !== null ? selectedSociety.toString() : ''}
+                  onChange={(e) => setSelectedSociety(e.target.value || null)}
+                  label="Filter by Society"
+                  sx={{ height: '40px' }}
+                >
+                  <MenuItem value="">All Societies</MenuItem>
+                  {societies.map((society) => (
+                    <MenuItem key={society.id} value={society.id.toString()}>
+                      {society.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Box>
+            <Button 
+              className="modern-button"
+              variant="contained"
+              sx={{ 
+                background: 'linear-gradient(45deg, var(--primary-color), var(--secondary-color))',
+                fontWeight: 600,
+                height: '40px',
+                order: { xs: 1, md: 3 },
+                width: { xs: '100%', md: 'auto' },
+                ml: { xs: 0, md: 1 },
+                '&:hover': {
+                  background: 'linear-gradient(45deg, var(--secondary-color), var(--primary-color))',
+                  transform: 'translateY(-2px)'
+                }
               }}
-              variant="outlined"
-              size="small"
-            />
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <FormControl fullWidth size="small">
-              <InputLabel id="society-select-label">Filter by Society</InputLabel>
-              <Select
-                labelId="society-select-label"
-                value={selectedSociety || ''}
-                onChange={(e) => setSelectedSociety(e.target.value || null)}
-                label="Filter by Society"
-              >
-                <MenuItem value="">All Societies</MenuItem>
-                {societies.map((society) => (
-                  <MenuItem key={society.id} value={society.id}>
-                    {society.name}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <Typography variant="subtitle2" color="text.secondary">
-              Showing {filteredResidents.length} of {residents.length} residents
-            </Typography>
-          </Grid>
-        </Grid>
-      </Paper>
+              startIcon={<AddIcon />}
+              onClick={handleOpenDialog}
+            >
+              Add Resident
+            </Button>
+          </Box>
+        </div>
 
       {loading ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', my: 4 }}>
@@ -304,13 +309,46 @@ const ResidentsList = () => {
       ) : error ? (
         <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>
       ) : filteredResidents.length > 0 ? (
-        <Grid container spacing={4}>
+        <Box sx={{ 
+          display: 'grid', 
+          gridTemplateColumns: { 
+            xs: 'minmax(280px, 300px)', 
+            sm: 'repeat(auto-fill, minmax(280px, 300px))', 
+            md: 'repeat(auto-fill, minmax(280px, 300px))' 
+          }, 
+          gap: 4, 
+          mt: 2,
+          justifyContent: 'center' 
+        }}>
           {filteredResidents.map((resident) => (
-            <Grid item key={resident.id} xs={12} sm={6} md={4}>
-              <ResidentCard resident={resident} />
-            </Grid>
+            <Box key={resident.id}>
+                <CardList 
+                  data={resident}
+                  title={`${resident.first_name} ${resident.last_name}`}
+                  fields={[
+                    ...(resident.email ? [{
+                      icon: <EmailIcon />,
+                      value: resident.email,
+                      iconColor: 'var(--secondary-color)'
+                    }] : []),
+                    ...(resident.phone ? [{
+                      icon: <PhoneIcon />,
+                      value: resident.phone,
+                      iconColor: 'var(--secondary-color)'
+                    }] : []),
+                  ]}
+                  actions={[
+                    {
+                      label: 'View Details',
+                      variant: 'contained',
+                      onClick: () => navigate(`/residents/${resident.id}`)
+                    }
+                  ]}
+                  borderColor="var(--primary-color)"
+                  hoverBorderColor="var(--accent-color)"
+                />            </Box>
           ))}
-        </Grid>
+        </Box>
       ) : (
         <Box className="no-residents">
           <Alert severity="info">No residents found matching your search criteria.</Alert>
@@ -393,12 +431,12 @@ const ResidentsList = () => {
                 <Select
                   labelId="society-id-label"
                   name="society_id"
-                  value={newResident.society_id}
+                  value={newResident.society_id.toString()}
                   label="Society"
-                  onChange={handleInputChange}
+                  onChange={handleSelectChange}
                 >
                   {societies.map(society => (
-                    <MenuItem key={society.id} value={society.id}>
+                    <MenuItem key={society.id} value={society.id.toString()}>
                       {society.name}
                     </MenuItem>
                   ))}
@@ -467,6 +505,7 @@ const ResidentsList = () => {
         </DialogActions>
       </Dialog>
     </Container>
+    </div>
   );
 };
 

@@ -1,21 +1,7 @@
-import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { ThemeProvider, createTheme } from '@mui/material';
-import Layout from './components/Layout';
-import SocietiesList from './pages/societies/SocietiesList';
-import SocietyDetails from './pages/societies/SocietyDetails';
-import ResidentsList from './pages/residents/ResidentsList';
-import ResidentFinancesList from './pages/finances/ResidentFinancesList';
-import SocietyFinancesList from './pages/expenses/SocietyFinancesList';
-import SettingsIndex from './pages/settings/SettingsIndex';
-import UsersManagement from './pages/settings/UsersManagement';
-import RolesManagement from './pages/settings/RolesManagement';
-import PermissionsManagement from './pages/settings/PermissionsManagement';
-import SocietyAdminsManagement from './pages/settings/SocietyAdminsManagement';
-import './App.css';
+import { createTheme, Theme } from '@mui/material';
 
-// Create theme aligned with our CSS variables
-const theme = createTheme({
+// Create theme aligned with our CSS variables in theme.css
+const theme: Theme = createTheme({
   palette: {
     primary: {
       main: '#0ea5e9', // --color-primary
@@ -103,8 +89,8 @@ const theme = createTheme({
     '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)', // --shadow-lg
     '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)', // --shadow-xl
     '0 25px 50px -12px rgb(0 0 0 / 0.25)', // --shadow-2xl
-    // Keep the remaining default MUI shadows
-    ...Array(18).fill('none'),
+    'none', 'none', 'none', 'none', 'none', 'none', 'none', 'none', 'none',
+    'none', 'none', 'none', 'none', 'none', 'none', 'none', 'none', 'none',
   ],
   transitions: {
     easing: {
@@ -112,42 +98,44 @@ const theme = createTheme({
     },
     duration: {
       shortest: 150,
+      shorter: 200,
+      short: 250,
       standard: 300,
-      complex: 500,
+      complex: 375,
+      enteringScreen: 225,
+      leavingScreen: 195,
+    },
+  },
+  components: {
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          borderRadius: 6,
+        },
+      },
+    },
+    MuiPaper: {
+      styleOverrides: {
+        rounded: {
+          borderRadius: 12,
+        },
+      },
+    },
+    MuiCard: {
+      styleOverrides: {
+        root: {
+          borderRadius: 12,
+        },
+      },
+    },
+    MuiChip: {
+      styleOverrides: {
+        root: {
+          borderRadius: 6,
+        },
+      },
     },
   },
 });
 
-// Settings pages are imported at the top
-
-function App() {
-  return (
-    <ThemeProvider theme={theme}>
-      <BrowserRouter>
-        <Layout>
-          <Routes>
-            {/* Main routes */}
-            <Route path="/societies" element={<SocietiesList />} />
-            <Route path="/societies/:societyId" element={<SocietyDetails />} />
-            <Route path="/residents" element={<ResidentsList />} />
-            <Route path="/finances" element={<ResidentFinancesList />} />
-            <Route path="/society-finances" element={<SocietyFinancesList />} />
-            
-            {/* Settings routes */}
-            <Route path="/settings" element={<SettingsIndex />} />
-            <Route path="/settings/users" element={<UsersManagement />} />
-            <Route path="/settings/roles" element={<RolesManagement />} />
-            <Route path="/settings/permissions" element={<PermissionsManagement />} />
-            <Route path="/settings/society-admins" element={<SocietyAdminsManagement />} />
-            
-            {/* Fallback routes */}
-            <Route path="/" element={<Navigate to="/societies" />} />
-            <Route path="*" element={<Navigate to="/societies" />} />
-          </Routes>
-        </Layout>
-      </BrowserRouter>
-    </ThemeProvider>
-  );
-}
-
-export default App;
+export default theme;

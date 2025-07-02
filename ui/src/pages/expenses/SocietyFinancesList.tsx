@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { format } from 'date-fns';
 import {
-  Box, Typography, Paper, Grid, TextField, MenuItem, Button,
+  Box, Typography, Paper, TextField, MenuItem, Button,
   Dialog, DialogActions, DialogContent, DialogTitle,
   FormControl,
   Card, CardContent, CardActions, IconButton, Chip, Divider,
@@ -11,28 +12,104 @@ import { Add, Edit, Delete, FilterList, Search, Event, Payment } from '@mui/icon
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { format } from 'date-fns';
 import { societyFinanceService } from '../../services';
 import { societyService } from '../../services/societies';
+import Grid from '../../components/shared/Grid';
 import './SocietyFinancesList.css';
 
-const SocietyFinancesList = ({ societyId: propSocietyId }) => {
-  const [societies, setSocieties] = useState([]);
+// Define TypeScript interfaces
+// Convert the id to string to ensure compatibility
+interface Society {
+  id: string;
+  name: string;
+}
+
+interface Finance {
+  id: string;
+  society_id: string;
+  expense_type: 'regular' | 'adhoc';
+  category: string;
+  vendor_name?: string;
+  expense_date: string;
+  amount: number;
+  currency: string;
+  payment_status: 'pending' | 'paid' | 'overdue' | 'partially_paid';
+  payment_date?: string | null;
+  payment_method?: string;
+  invoice_number?: string;
+  receipt_number?: string;
+  description?: string;
+  recurring: boolean;
+  recurring_frequency?: string;
+  next_due_date?: string | null;
+}
+
+interface FinanceForm {
+  society_id: string;
+  expense_type: 'regular' | 'adhoc';
+  category: string;
+  vendor_name: string;
+  expense_date: Date;
+  amount: string;
+  currency: string;
+  payment_status: 'pending' | 'paid' | 'overdue' | 'partially_paid';
+  payment_date: Date | null;
+  payment_method: string;
+  invoice_number: string;
+  receipt_number: string;
+  description: string;
+  recurring: boolean;
+  recurring_frequency: string;
+  next_due_date: Date | null;
+}
+
+interface Filters {
+  category: string;
+  expense_type: string;
+  payment_status: string;
+  start_date: Date | null;
+  end_date: Date | null;
+  search: string;
+}
+
+interface FormErrors {
+  [key: string]: string | null;
+}
+
+interface Summary {
+  categories: {
+    [key: string]: {
+      amount: number;
+      count: number;
+    }
+  };
+  total: {
+    amount: number;
+    count: number;
+  }
+}
+
+interface SocietyFinancesListProps {
+  societyId?: string;
+}
+
+const SocietyFinancesList: React.FC<SocietyFinancesListProps> = ({ societyId: propSocietyId }) => {
+  const [societies, setSocieties] = useState<Society[]>([]);
   
   // State
-  const [finances, setFinances] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [summary, setSummary] = useState({ categories: {}, total: { amount: 0, count: 0 } });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [formError, setFormError] = useState({});
-  const [selectedFinance, setSelectedFinance] = useState(null);
-  const [openDialog, setOpenDialog] = useState(false);
-  const [viewMode, setViewMode] = useState('list'); // 'list' or 'card'
-  const [selectedSocietyId, setSelectedSocietyId] = useState(propSocietyId || '');
+  const [finances, setFinances] = useState<Finance[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [summary, setSummary] = useState<Summary>({ categories: {}, total: { amount: 0, count: 0 } });
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const [formError, setFormError] = useState<FormErrors>({});
+  const [selectedFinance, setSelectedFinance] = useState<Finance | null>(null);
+  const [openDialog, setOpenDialog] = useState<boolean>(false);
+  const [viewMode, setViewMode] = useState<'list' | 'card'>('list'); 
+  const [selectedSocietyId, setSelectedSocietyId] = useState<string>(propSocietyId || '');
   
   // Filter state
-  const [filters, setFilters] = useState({
+  const [filters, setFilters] = useState<Filters>({
     category: '',
     expense_type: '',
     payment_status: '',
@@ -42,7 +119,7 @@ const SocietyFinancesList = ({ societyId: propSocietyId }) => {
   });
   
   // Form state for new/edit finance
-  const [financeForm, setFinanceForm] = useState({
+  const [financeForm, setFinanceForm] = useState<FinanceForm>({
     society_id: selectedSocietyId,
     expense_type: 'regular',
     category: '',
@@ -65,11 +142,18 @@ const SocietyFinancesList = ({ societyId: propSocietyId }) => {
   const fetchSocieties = React.useCallback(async () => {
     try {
       const data = await societyService.getAllSocieties();
-      setSocieties(data);
+      
+      // Convert data to Society interface format
+      const convertedData: Society[] = data.map(society => ({
+        id: String(society.id), // Convert id to string to ensure type safety
+        name: society.name
+      }));
+      
+      setSocieties(convertedData);
       
       // If societies are loaded and no society is selected yet, select the first one
-      if (data.length > 0 && !selectedSocietyId) {
-        setSelectedSocietyId(data[0].id);
+      if (convertedData.length > 0 && !selectedSocietyId) {
+        setSelectedSocietyId(String(convertedData[0].id));
       }
     } catch (err) {
       console.error('Failed to fetch societies:', err);
@@ -112,7 +196,7 @@ const SocietyFinancesList = ({ societyId: propSocietyId }) => {
     setError(null);
     
     try {
-      const apiFilters = {
+      const apiFilters: Record<string, any> = {
         category: filters.category || undefined,
         expense_type: filters.expense_type || undefined,
         payment_status: filters.payment_status || undefined,
@@ -126,7 +210,7 @@ const SocietyFinancesList = ({ societyId: propSocietyId }) => {
       let filteredData = data;
       if (filters.search) {
         const searchTerm = filters.search.toLowerCase();
-        filteredData = data.filter(finance => 
+        filteredData = data.filter((finance: Finance) => 
           finance.category.toLowerCase().includes(searchTerm) ||
           (finance.vendor_name && finance.vendor_name.toLowerCase().includes(searchTerm)) ||
           (finance.description && finance.description.toLowerCase().includes(searchTerm))
@@ -173,7 +257,7 @@ const SocietyFinancesList = ({ societyId: propSocietyId }) => {
   };
 
   // Handle filter changes
-  const handleFilterChange = (field) => (event) => {
+  const handleFilterChange = (field: keyof Filters) => (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
     setFilters({
       ...filters,
@@ -182,7 +266,7 @@ const SocietyFinancesList = ({ societyId: propSocietyId }) => {
   };
 
   // Handle date filter changes
-  const handleDateFilterChange = (field) => (date) => {
+  const handleDateFilterChange = (field: keyof Filters) => (date: Date | null) => {
     setFilters({
       ...filters,
       [field]: date
@@ -227,7 +311,7 @@ const SocietyFinancesList = ({ societyId: propSocietyId }) => {
   };
 
   // Open dialog to edit finance
-  const handleEditFinance = (finance) => {
+  const handleEditFinance = (finance: Finance) => {
     setSelectedFinance(finance);
     setFinanceForm({
       society_id: finance.society_id,
@@ -252,12 +336,12 @@ const SocietyFinancesList = ({ societyId: propSocietyId }) => {
   };
 
   // Handle form field changes
-  const handleFormChange = (field) => (event) => {
+  const handleFormChange = (field: keyof FinanceForm) => (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.type === 'checkbox' ? event.target.checked : event.target.value;
     setFinanceForm({
       ...financeForm,
       [field]: value
-    });
+    } as FinanceForm);
     
     // Clear error for this field if any
     if (formError[field]) {
@@ -269,11 +353,11 @@ const SocietyFinancesList = ({ societyId: propSocietyId }) => {
   };
 
   // Handle date changes in form
-  const handleDateChange = (field) => (date) => {
+  const handleDateChange = (field: keyof FinanceForm) => (date: Date | null) => {
     setFinanceForm({
       ...financeForm,
       [field]: date
-    });
+    } as FinanceForm);
     
     // Clear error for this field if any
     if (formError[field]) {
@@ -286,12 +370,12 @@ const SocietyFinancesList = ({ societyId: propSocietyId }) => {
 
   // Validate form before submission
   const validateForm = () => {
-    const errors = {};
+    const errors: FormErrors = {};
     
     if (!financeForm.category) errors.category = 'Category is required';
     if (!financeForm.expense_date) errors.expense_date = 'Expense date is required';
     if (!financeForm.amount) errors.amount = 'Amount is required';
-    else if (isNaN(financeForm.amount) || parseFloat(financeForm.amount) <= 0) {
+    else if (isNaN(parseFloat(financeForm.amount)) || parseFloat(financeForm.amount) <= 0) {
       errors.amount = 'Amount must be a positive number';
     }
     
@@ -336,7 +420,7 @@ const SocietyFinancesList = ({ societyId: propSocietyId }) => {
       fetchSocietyFinances();
       fetchCategories();
       fetchSummary();
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to save finance:', err);
       if (err.response && err.response.data && err.response.data.detail) {
         if (err.response.data.detail.field) {
@@ -356,7 +440,7 @@ const SocietyFinancesList = ({ societyId: propSocietyId }) => {
   };
 
   // Delete finance
-  const handleDeleteFinance = async (finance) => {
+  const handleDeleteFinance = async (finance: Finance) => {
     if (!window.confirm(`Are you sure you want to delete this ${finance.category} expense?`)) {
       return;
     }
@@ -377,7 +461,7 @@ const SocietyFinancesList = ({ societyId: propSocietyId }) => {
   };
 
   // Get the appropriate chip color for payment status
-  const getPaymentStatusColor = (status) => {
+  const getPaymentStatusColor = (status: string) => {
     switch (status) {
       case 'paid': return 'success';
       case 'pending': return 'warning';
@@ -543,7 +627,7 @@ const SocietyFinancesList = ({ societyId: propSocietyId }) => {
                     label="From Date"
                     value={filters.start_date}
                     onChange={handleDateFilterChange('start_date')}
-                    renderInput={(params) => <TextField {...params} fullWidth size="small" />}
+                    slotProps={{ textField: { fullWidth: true, size: 'small' } }}
                   />
                 </LocalizationProvider>
               </Grid>
@@ -554,7 +638,7 @@ const SocietyFinancesList = ({ societyId: propSocietyId }) => {
                     label="To Date"
                     value={filters.end_date}
                     onChange={handleDateFilterChange('end_date')}
-                    renderInput={(params) => <TextField {...params} fullWidth size="small" />}
+                    slotProps={{ textField: { fullWidth: true, size: 'small' } }}
                   />
                 </LocalizationProvider>
               </Grid>
@@ -686,7 +770,7 @@ const SocietyFinancesList = ({ societyId: propSocietyId }) => {
                         <TableCell>{finance.vendor_name || '-'}</TableCell>
                         <TableCell>{format(new Date(finance.expense_date), 'dd MMM yyyy')}</TableCell>
                         <TableCell>
-                          {parseFloat(finance.amount).toLocaleString('en-IN', { style: 'currency', currency: finance.currency })}
+                          {parseFloat(finance.amount.toString()).toLocaleString('en-IN', { style: 'currency', currency: finance.currency })}
                         </TableCell>
                         <TableCell>
                           <Chip
@@ -698,7 +782,7 @@ const SocietyFinancesList = ({ societyId: propSocietyId }) => {
                         <TableCell>
                           <Chip
                             label={finance.payment_status.replace('_', ' ')}
-                            color={getPaymentStatusColor(finance.payment_status)}
+                            color={getPaymentStatusColor(finance.payment_status) as any}
                             size="small"
                           />
                         </TableCell>
@@ -746,11 +830,11 @@ const SocietyFinancesList = ({ societyId: propSocietyId }) => {
                           
                           <Box className="card-amount">
                             <Typography variant="h5">
-                              {parseFloat(finance.amount).toLocaleString('en-IN', { style: 'currency', currency: finance.currency })}
+                              {parseFloat(finance.amount.toString()).toLocaleString('en-IN', { style: 'currency', currency: finance.currency })}
                             </Typography>
                             <Chip
                               label={finance.payment_status.replace('_', ' ')}
-                              color={getPaymentStatusColor(finance.payment_status)}
+                              color={getPaymentStatusColor(finance.payment_status) as any}
                               size="small"
                             />
                           </Box>
@@ -876,14 +960,13 @@ const SocietyFinancesList = ({ societyId: propSocietyId }) => {
                           label="Expense Date"
                           value={financeForm.expense_date}
                           onChange={handleDateChange('expense_date')}
-                          renderInput={(params) => (
-                            <TextField 
-                              {...params} 
-                              required
-                              error={!!formError.expense_date}
-                              helperText={formError.expense_date}
-                            />
-                          )}
+                          slotProps={{ 
+                            textField: { 
+                              required: true,
+                              error: !!formError.expense_date,
+                              helperText: formError.expense_date
+                            } 
+                          }}
                         />
                       </LocalizationProvider>
                     </FormControl>
@@ -942,7 +1025,7 @@ const SocietyFinancesList = ({ societyId: propSocietyId }) => {
                           label="Payment Date"
                           value={financeForm.payment_date}
                           onChange={handleDateChange('payment_date')}
-                          renderInput={(params) => <TextField {...params} />}
+                          slotProps={{ textField: { fullWidth: true } }}
                         />
                       </LocalizationProvider>
                     </FormControl>

@@ -2,8 +2,8 @@
 @import '../../styles/theme.css';
 
 .societies-container {
-  padding: 24px 24px 24px 0; /* Reduced left padding */
-  background-color: var(--light-bg);
+  padding: 16px 0; /* Added vertical padding */
+  /* Removed background-color */
   min-height: 100vh;
   width: 100%;
   box-sizing: border-box;
@@ -11,37 +11,29 @@
 
 .societies-header {
   display: flex;
-  align-items: center;
-  margin-bottom: 32px;
+  flex-direction: column;
+  gap: 16px;
+  align-items: flex-start;
+  margin-bottom: 24px; /* Restored to original spacing */
   position: relative;
-  padding-left: 24px; /* Add left padding to header only */
+  padding: 0 8px; /* Added horizontal padding */
 }
 
 .societies-header-title {
-  flex-grow: 1;
-  font-size: 2.2rem;
+  margin: 4px 0;
+  font-size: 1.75rem;
   font-weight: 700;
   color: var(--text-primary);
   position: relative;
+  padding-bottom: 4px; /* Add a bit of padding below the title */
 }
 
-.societies-header-title::after {
-  content: '';
-  position: absolute;
-  bottom: -8px;
-  left: 0;
-  width: 60px;
-  height: 4px;
-  background: var(--primary-color);
-  border-radius: 2px;
-}
-
-.societies-filters {
-  margin-bottom: 24px;
-  padding: 24px;
-  background-color: white;
-  border-radius: var(--border-radius);
-  box-shadow: var(--card-shadow);
+@media (min-width: 768px) {
+  .societies-header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
 }
 
 .society-card {
@@ -73,5 +65,6 @@
 
 .no-societies {
   text-align: center;
-  padding: 2rem;
+  padding: 2.5rem;
+  margin: 1rem;
 }
