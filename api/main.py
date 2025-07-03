@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from endpoints import society, resident, finance, user, role, permission, society_admin, auth, society_finance
+from endpoints import society, resident, finance, user, role, permission, society_admin, auth, society_finance, resident_finance
 from database import engine
 import models
 
@@ -35,6 +35,7 @@ app.include_router(permission.router, prefix="/api/v1", tags=["Permissions"])
 app.include_router(society_admin.router, prefix="/api/v1", tags=["Society Admins"])
 app.include_router(auth.router, prefix="/api/v1", tags=["Authentication"])
 app.include_router(society_finance.router, prefix="/api/v1", tags=["Society Finances"])
+app.include_router(resident_finance.router, prefix="/api/v1", tags=["Resident Finances"])
 
 
 @app.get("/", tags=["Root"])

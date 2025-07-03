@@ -68,7 +68,7 @@ const residentService = {
 
   // Get resident finances summary
   getResidentFinancesSummary: async (residentId: string | number): Promise<ResidentFinancesSummary> => {
-    const response = await apiClient.get(`/residents/${residentId}/finances/summary`);
+    const response = await apiClient.get(`/api/v1/residents/${residentId}/finance-summary`);
     return response.data;
   }
 };
