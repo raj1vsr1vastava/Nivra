@@ -33,24 +33,24 @@ const CardList: React.FC<CardProps> = ({
       sx={{ 
         height: '100%', 
         width: '100%', // Takes full width of its container
-        maxWidth: '280px', // Reduced from 300px to fit more cards
-        minWidth: '240px', // Reduced from 280px to fit more cards on mobile
-        margin: '0 auto', // Center card in its grid cell
+        maxWidth: '100%', // Allow cards to fill available space
+        minWidth: '240px', // Maintain minimum width for mobile
+        margin: '2px', // Add a slight margin for better spacing
         display: 'flex', 
         flexDirection: 'column',
-        borderRadius: '12px', // Slightly reduced
+        borderRadius: '12px', // Slightly increased for less compact look
         overflow: 'hidden',
         borderLeft: `4px solid ${borderColor}`,
         boxShadow: 'var(--shadow-md)',
         transition: 'all 0.3s ease',
         '&:hover': {
           borderColor: hoverBorderColor,
-          transform: 'translateY(-4px)', // Reduced hover lift
+          transform: 'translateY(-4px)', // Increased hover lift slightly
           boxShadow: 'var(--shadow-lg)'
         }
       }}
     >
-      <CardContent sx={{ flexGrow: 1, p: 2, pb: 1 }}> {/* Reduced padding from 2.5 to 2 */}
+      <CardContent sx={{ flexGrow: 1, p: 2.5, pb: 1.25 }}> {/* Increased padding for less compact look */}
         {/* Card Title - Standardized for 25 characters with ellipsis */}
         <Typography 
           variant="h5" 
@@ -58,28 +58,28 @@ const CardList: React.FC<CardProps> = ({
           sx={{ 
             fontWeight: 600, 
             color: 'var(--text-primary)',
-            mb: 1.5, // Reduced from 2
+            mb: 2, // Restored margin for title
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
             width: '100%',
-            maxWidth: '240px', // Reduced from 260px
-            fontSize: '1.2rem', // Slightly smaller to fit more content
-            lineHeight: 1.3 // Reduced from 1.4
+            maxWidth: '260px', // Restored width for title
+            fontSize: '1.25rem', // Increased font size
+            lineHeight: 1.4 // Restored line height
           }}
           title={title} // Add title attribute to show full text on hover
         >
           {title}
         </Typography>
         
-        <Divider sx={{ my: 0.75 }} /> {/* Reduced from my: 1 */}
+        <Divider sx={{ my: 1.25 }} /> {/* Increased spacing around divider */}
         
         {/* Card Fields - Only showing the minimal information */}
         {fields.map((field, index) => (
           <Box 
             key={index} 
             sx={{ 
-              mt: index > 0 ? 1.25 : 1.5, // Reduced spacing
+              mt: index > 0 ? 1.75 : 2, // Increased spacing between fields
               display: 'flex', 
               alignItems: 'flex-start' 
             }}
@@ -88,7 +88,7 @@ const CardList: React.FC<CardProps> = ({
               React.cloneElement(field.icon, { 
                 sx: { 
                   fontSize: "small",
-                  mr: 1, // Reduced from 1.5
+                  mr: 1.5, // Restored margin for icon
                   color: field.iconColor || 'var(--primary-color)',
                   mt: 0.3
                 } 
@@ -128,7 +128,7 @@ const CardList: React.FC<CardProps> = ({
       
       {/* Action Buttons */}
       {actions.length > 0 && (
-        <CardActions sx={{ p: 1.5, pt: 0 }}> {/* Reduced padding from 2 to 1.5 */}
+        <CardActions sx={{ p: 2, pt: 0.5 }}> {/* Increased padding for action buttons */}
           {actions.map((action, index) => (
             <Button 
               key={`action-${index}`}

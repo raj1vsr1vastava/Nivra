@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { 
   Container, 
   Typography, 
@@ -19,13 +19,15 @@ import {
   FormHelperText,
   Switch,
   FormControlLabel,
-  SelectChangeEvent
+  SelectChangeEvent,
+  IconButton
 } from '@mui/material';
 import { residentService, societyService } from '../../services';
 import AddIcon from '@mui/icons-material/Add';
 import SearchIcon from '@mui/icons-material/Search';
 import EmailIcon from '@mui/icons-material/Email';
 import PhoneIcon from '@mui/icons-material/Phone';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import Grid from '../../components/shared/Grid';
 import { SocietyData } from '../../types';
 import './ResidentsList.css';
@@ -57,8 +59,15 @@ interface FieldErrors {
   committee_role?: string;
 }
 
+// Route params interface
+type RouteParams = {
+  societyId?: string;
+};
+
 const ResidentsList: React.FC = () => {
   const navigate = useNavigate();
+  const params = useParams<RouteParams>();
+  const societyId = params.societyId;
   const [residents, setResidents] = useState<Resident[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -84,11 +93,12 @@ const ResidentsList: React.FC = () => {
 
   // Need to add the societies state and fetch
   const [societies, setSocieties] = useState<SocietyData[]>([]);
+  const [currentSociety, setCurrentSociety] = useState<SocietyData | null>(null);
 
   useEffect(() => {
     fetchResidents();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedSociety]);
+  }, [selectedSociety, societyId]);
 
   // Fetch societies for the dropdown
   useEffect(() => {
@@ -104,13 +114,34 @@ const ResidentsList: React.FC = () => {
     fetchSocieties();
   }, []);
 
+  // Fetch current society details when societyId is provided
+  useEffect(() => {
+    const fetchCurrentSociety = async (): Promise<void> => {
+      if (societyId) {
+        try {
+          const societyData = await societyService.getSocietyById(societyId);
+          setCurrentSociety(societyData);
+        } catch (err) {
+          console.error('Error fetching current society:', err);
+        }
+      } else {
+        setCurrentSociety(null);
+      }
+    };
+    
+    fetchCurrentSociety();
+  }, [societyId]);
+
   const fetchResidents = async (): Promise<void> => {
     try {
       setLoading(true);
       let data: Resident[];
       
-      if (selectedSociety) {
-        // Fetch residents for specific society
+      // If societyId is provided from route params, filter by that society
+      if (societyId) {
+        data = await residentService.getSocietyResidents(societyId);
+      } else if (selectedSociety) {
+        // Fetch residents for specific society from dropdown filter
         data = await residentService.getSocietyResidents(selectedSociety);
       } else {
         // Fetch all residents
@@ -139,8 +170,10 @@ const ResidentsList: React.FC = () => {
   
   const handleOpenDialog = (): void => {
     setOpenDialog(true);
-    // Default to the currently selected society if one is selected
-    if (selectedSociety) {
+    // Default to the societyId from route params, or the currently selected society from dropdown
+    if (societyId) {
+      setNewResident(prev => ({ ...prev, society_id: societyId }));
+    } else if (selectedSociety) {
       setNewResident(prev => ({ ...prev, society_id: selectedSociety }));
     }
   };
@@ -217,17 +250,33 @@ const ResidentsList: React.FC = () => {
   
   return (
     <div className="residents-container">
-      <Container maxWidth="xl" sx={{ px: { xs: 1, sm: 2, md: 3 } /* Increased padding for better spacing */ }}>
+      <Container maxWidth="xl" sx={{ px: 0 /* Removed horizontal padding to fix left margin issue */ }}>
         <div className="residents-header">
+          {societyId && (
+            <IconButton 
+              onClick={() => navigate(`/societies/${societyId}`)}
+              sx={{ 
+                mr: 2,
+                color: 'var(--text-secondary)',
+                '&:hover': {
+                  color: 'var(--primary-color)',
+                  background: 'rgba(var(--primary-rgb), 0.05)'
+                }
+              }}
+            >
+              <ArrowBackIcon />
+            </IconButton>
+          )}
           <h1 className="residents-header-title">
-            Residents
+            {currentSociety ? `${currentSociety.name} Residents` : 'Residents'}
           </h1>
           <Box sx={{ 
             display: 'flex', 
             alignItems: 'center', 
             gap: { xs: 1, md: 2 },
             flexWrap: { xs: 'wrap', md: 'nowrap' },
-            width: { xs: '100%', md: 'auto' }
+            width: { xs: '100%', md: 'auto' },
+            ml: 'auto'
           }}>
             <Box sx={{ 
               display: 'flex',
@@ -254,31 +303,33 @@ const ResidentsList: React.FC = () => {
                 size="small"
               />
             </Box>
-            <Box sx={{ 
-              display: 'flex',
-              flexGrow: 1, 
-              maxWidth: { xs: '100%', md: '250px' },
-              minWidth: { xs: '100%', md: '200px' },
-              order: { xs: 3, md: 2 }
-            }}>
-              <FormControl fullWidth size="small" sx={{ height: '40px' }}>
-                <InputLabel id="society-select-label">Filter by Society</InputLabel>
-                <Select
-                  labelId="society-select-label"
-                  value={selectedSociety !== null ? selectedSociety.toString() : ''}
-                  onChange={(e) => setSelectedSociety(e.target.value || null)}
-                  label="Filter by Society"
-                  sx={{ height: '40px' }}
-                >
-                  <MenuItem value="">All Societies</MenuItem>
-                  {societies.map((society) => (
-                    <MenuItem key={society.id} value={society.id.toString()}>
-                      {society.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Box>
+            {!societyId && (
+              <Box sx={{ 
+                display: 'flex',
+                flexGrow: 1, 
+                maxWidth: { xs: '100%', md: '250px' },
+                minWidth: { xs: '100%', md: '200px' },
+                order: { xs: 3, md: 2 }
+              }}>
+                <FormControl fullWidth size="small" sx={{ height: '40px' }}>
+                  <InputLabel id="society-select-label">Filter by Society</InputLabel>
+                  <Select
+                    labelId="society-select-label"
+                    value={selectedSociety !== null ? selectedSociety.toString() : ''}
+                    onChange={(e) => setSelectedSociety(e.target.value || null)}
+                    label="Filter by Society"
+                    sx={{ height: '40px' }}
+                  >
+                    <MenuItem value="">All Societies</MenuItem>
+                    {societies.map((society) => (
+                      <MenuItem key={society.id} value={society.id.toString()}>
+                        {society.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Box>
+            )}
             <Button 
               variant="contained" 
               color="primary" 
@@ -306,13 +357,13 @@ const ResidentsList: React.FC = () => {
         <Box sx={{ 
           display: 'grid', 
           gridTemplateColumns: { 
-            xs: 'minmax(280px, 300px)', 
-            sm: 'repeat(auto-fill, minmax(280px, 300px))', 
-            md: 'repeat(auto-fill, minmax(280px, 300px))' 
+            xs: 'repeat(auto-fill, minmax(250px, 1fr))', /* Changed to match responsive behavior of SocietiesList */
+            sm: 'repeat(auto-fill, minmax(260px, 1fr))',
+            md: 'repeat(auto-fill, minmax(280px, 1fr))' 
           }, 
-          gap: { xs: 1, sm: 2, md: 2 }, 
+          gap: { xs: 1.5, sm: 2, md: 2.5 }, /* Increased gap between cards */
           mt: 2,
-          justifyContent: 'center' 
+          px: 0 
         }}>
           {filteredResidents.map((resident) => (
             <Box key={resident.id}>

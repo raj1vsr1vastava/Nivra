@@ -5,7 +5,8 @@ import {
   Box, 
   CircularProgress, 
   Alert,
-  Button
+  Button,
+  IconButton
 } from '@mui/material';
 import CardDetails from '../../components/CardDetails';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -81,11 +82,11 @@ const SocietyDetails: React.FC = () => {
       const transformedData: Society = {
         ...societyData,
         address: societyData.address || '',
-        city: '',  // These fields might be extracted from the address in a real app
-        state: '',
-        zipcode: '',
-        country: '',
-        total_units: societyData.units || 0
+        city: societyData.city || '',  // Use actual data from the API
+        state: societyData.state || '',
+        zipcode: societyData.zipcode || '',
+        country: societyData.country || '',
+        total_units: societyData.total_units || 0  // Use correct field name from API
       };
       
       setSociety(transformedData);
@@ -123,7 +124,7 @@ const SocietyDetails: React.FC = () => {
   if (error) {
     return (
       <div className="society-details-container">
-        <Container maxWidth="lg">
+        <Container maxWidth="xl" sx={{ px: 0 /* Removed horizontal padding to fix left margin issue */ }}>
           <Alert 
             severity="error" 
             sx={{ 
@@ -135,20 +136,18 @@ const SocietyDetails: React.FC = () => {
           >
             {error}
           </Alert>
-          <Button 
-            className="modern-button"
-            startIcon={<ArrowBackIcon />} 
+          <IconButton 
             onClick={() => navigate('/societies')}
             sx={{ 
-              color: 'var(--primary-color)',
-              fontWeight: 600,
+              color: 'var(--text-secondary)',
               '&:hover': {
+                color: 'var(--primary-color)',
                 background: 'rgba(var(--primary-rgb), 0.05)'
               }
             }}
           >
-            Back to Societies
-          </Button>
+            <ArrowBackIcon />
+          </IconButton>
         </Container>
       </div>
     );
@@ -157,7 +156,7 @@ const SocietyDetails: React.FC = () => {
   if (!society) {
     return (
       <div className="society-details-container">
-        <Container maxWidth="lg">
+        <Container maxWidth="xl" sx={{ px: 0 /* Removed horizontal padding to fix left margin issue */ }}>
           <Alert 
             severity="warning" 
             sx={{ 
@@ -169,20 +168,18 @@ const SocietyDetails: React.FC = () => {
           >
             Society not found
           </Alert>
-          <Button 
-            className="modern-button"
-            startIcon={<ArrowBackIcon />} 
+          <IconButton 
             onClick={() => navigate('/societies')}
             sx={{ 
-              color: 'var(--primary-color)',
-              fontWeight: 600,
+              color: 'var(--text-secondary)',
               '&:hover': {
+                color: 'var(--primary-color)',
                 background: 'rgba(var(--primary-rgb), 0.05)'
               }
             }}
           >
-            Back to Societies
-          </Button>
+            <ArrowBackIcon />
+          </IconButton>
         </Container>
       </div>
     );
@@ -194,11 +191,9 @@ const SocietyDetails: React.FC = () => {
 
   return (
     <div className="society-details-container">
-      <Container maxWidth="lg">
+      <Container maxWidth="xl" sx={{ px: 0 /* Removed horizontal padding to fix left margin issue */ }}>
         <div className="society-header">
-          <Button 
-            className="modern-button"
-            startIcon={<ArrowBackIcon />} 
+          <IconButton 
             onClick={() => navigate('/societies')}
             sx={{ 
               mr: 2,
@@ -209,78 +204,321 @@ const SocietyDetails: React.FC = () => {
               }
             }}
           >
-            Back
-          </Button>
+            <ArrowBackIcon />
+          </IconButton>
           <h1 className="society-header-title">
             {society.name}
           </h1>
-          <Button 
-            className="modern-button"
-            variant="outlined" 
-            startIcon={<EditIcon />}
-            sx={{ 
-              borderColor: 'var(--secondary-color)',
-              color: 'var(--secondary-color)',
-              '&:hover': {
-                borderColor: 'var(--accent-color)',
-                color: 'var(--accent-color)',
-                background: 'rgba(var(--accent-rgb), 0.05)'
-              }
-            }}
-            // onClick={() => navigate(`/societies/${society.id}/edit`)}
-          >
-            Edit
-          </Button>
         </div>
 
-        <CardDetails 
-          data={society}
-          title={society.name}
-          fields={[
-            {
-              icon: <LocationOnIcon />,
-              label: "Address",
-              value: `${society.address}, ${society.city}, ${society.state} ${society.zipcode}, ${society.country}`,
-              iconColor: 'var(--primary-color)'
-            },
-            ...(society.contact_email ? [{
-              icon: <EmailIcon />,
-              label: "Email",
-              value: society.contact_email,
-              iconColor: 'var(--secondary-color)'
-            }] : []),
-            ...(society.contact_phone ? [{
-              icon: <PhoneIcon />,
-              label: "Phone",
-              value: society.contact_phone,
-              iconColor: 'var(--secondary-color)'
-            }] : []),
-            {
-              icon: <HomeIcon />,
-              label: "Total Units",
-              value: society.total_units,
-              iconColor: 'var(--info)',
-              gridColumn: 6
-            },
-            {
-              icon: <CalendarMonthIcon />,
-              label: "Registration Date",
-              value: formattedDate,
-              iconColor: 'var(--info)',
-              gridColumn: 6
-            },
-            ...(society.registration_number ? [{
-              icon: <AssignmentIcon />,
-              label: "Registration Number",
-              value: society.registration_number,
-              iconColor: 'var(--accent-color)',
-              gridColumn: 6,
-              fontWeight: 500
-            }] : [])
-          ]}
-          borderColor="var(--primary-color)"
-          hoverBorderColor="var(--accent-color)"
-        />
+        {/* Society Details Cards Grid */}
+        <Grid container spacing={3} sx={{ mb: 4 }}>
+          {/* Address Card */}
+          <Grid item xs={12} sm={6} md={4}>
+            <Box sx={{ 
+              p: 3, 
+              height: '180px',
+              width: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+              position: 'relative',
+              bgcolor: 'var(--color-card)', 
+              borderRadius: 'var(--border-radius)',
+              border: '1px solid var(--color-border-light)',
+              boxShadow: 'var(--shadow-sm)',
+              transition: 'all var(--transition-normal)',
+              '&:hover': {
+                transform: 'translateY(-2px)',
+                boxShadow: 'var(--shadow-lg)',
+                borderColor: 'var(--primary-color)'
+              }
+            }}>
+              {/* Edit Icon */}
+              <Box sx={{ 
+                position: 'absolute', 
+                top: 12, 
+                right: 12,
+                cursor: 'pointer',
+                p: 0.5,
+                borderRadius: '50%',
+                '&:hover': {
+                  bgcolor: 'rgba(var(--primary-rgb), 0.1)'
+                }
+              }}
+              onClick={() => navigate(`/societies/${society.id}/edit?field=address`)}
+              >
+                <EditIcon sx={{ fontSize: '1.2rem', color: 'var(--text-secondary)' }} />
+              </Box>
+              
+              <Typography variant="h6" sx={{ fontWeight: 600, color: 'var(--text-primary)', mb: 2 }}>
+                Address
+              </Typography>
+              <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                  <LocationOnIcon sx={{ color: 'var(--primary-color)', mr: 1.5, fontSize: '1.25rem' }} />
+                  <Typography variant="body2" sx={{ 
+                    color: 'var(--text-secondary)',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                    fontSize: '0.875rem'
+                  }}>
+                    {society.address}
+                  </Typography>
+                </Box>
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                  <LocationOnIcon sx={{ color: 'var(--primary-color)', mr: 1.5, fontSize: '1.25rem', opacity: 0.7 }} />
+                  <Typography variant="body2" sx={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
+                    {society.city}, {society.state}
+                  </Typography>
+                </Box>
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                  <LocationOnIcon sx={{ color: 'var(--primary-color)', mr: 1.5, fontSize: '1.25rem', opacity: 0.7 }} />
+                  <Typography variant="body2" sx={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
+                    {society.zipcode}, {society.country}
+                  </Typography>
+                </Box>
+              </Box>
+            </Box>
+          </Grid>
+
+          {/* Contact Information Card */}
+          {(society.contact_email || society.contact_phone) && (
+            <Grid item xs={12} sm={6} md={4}>
+              <Box sx={{ 
+                p: 3, 
+                height: '180px',
+                width: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                position: 'relative',
+                bgcolor: 'var(--color-card)', 
+                borderRadius: 'var(--border-radius)',
+                border: '1px solid var(--color-border-light)',
+                boxShadow: 'var(--shadow-sm)',
+                transition: 'all var(--transition-normal)',
+                '&:hover': {
+                  transform: 'translateY(-2px)',
+                  boxShadow: 'var(--shadow-lg)',
+                  borderColor: 'var(--secondary-color)'
+                }
+              }}>
+                {/* Edit Icon */}
+                <Box sx={{ 
+                  position: 'absolute', 
+                  top: 12, 
+                  right: 12,
+                  cursor: 'pointer',
+                  p: 0.5,
+                  borderRadius: '50%',
+                  '&:hover': {
+                    bgcolor: 'rgba(var(--primary-rgb), 0.1)'
+                  }
+                }}
+                onClick={() => navigate(`/societies/${society.id}/edit?field=contact`)}
+                >
+                  <EditIcon sx={{ fontSize: '1.2rem', color: 'var(--text-secondary)' }} />
+                </Box>
+
+                <Typography variant="h6" sx={{ fontWeight: 600, color: 'var(--text-primary)', mb: 2 }}>
+                  Contact
+                </Typography>
+                <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+                  {society.contact_email && (
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                      <EmailIcon sx={{ color: 'var(--secondary-color)', mr: 1.5, fontSize: '1.25rem' }} />
+                      <Typography variant="body2" sx={{ 
+                        color: 'var(--text-secondary)',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                        fontSize: '0.875rem'
+                      }}>
+                        {society.contact_email}
+                      </Typography>
+                    </Box>
+                  )}
+                  {society.contact_phone && (
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                      <PhoneIcon sx={{ color: 'var(--secondary-color)', mr: 1.5, fontSize: '1.25rem' }} />
+                      <Typography variant="body2" sx={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
+                        {society.contact_phone}
+                      </Typography>
+                    </Box>
+                  )}
+                </Box>
+              </Box>
+            </Grid>
+          )}
+
+          {/* Total Units Card */}
+          <Grid item xs={12} sm={6} md={4}>
+            <Box sx={{ 
+              p: 3, 
+              height: '180px',
+              width: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              position: 'relative',
+              bgcolor: 'var(--color-card)', 
+              borderRadius: 'var(--border-radius)',
+              border: '1px solid var(--color-border-light)',
+              boxShadow: 'var(--shadow-sm)',
+              transition: 'all var(--transition-normal)',
+              textAlign: 'center',
+              '&:hover': {
+                transform: 'translateY(-2px)',
+                boxShadow: 'var(--shadow-lg)',
+                borderColor: 'var(--info)'
+              }
+            }}>
+              {/* Edit Icon */}
+              <Box sx={{ 
+                position: 'absolute', 
+                top: 12, 
+                right: 12,
+                cursor: 'pointer',
+                p: 0.5,
+                borderRadius: '50%',
+                '&:hover': {
+                  bgcolor: 'rgba(var(--primary-rgb), 0.1)'
+                }
+              }}
+              onClick={() => navigate(`/societies/${society.id}/edit?field=total_units`)}
+              >
+                <EditIcon sx={{ fontSize: '1.2rem', color: 'var(--text-secondary)' }} />
+              </Box>
+
+              <HomeIcon sx={{ color: 'var(--info)', fontSize: '2.5rem', mb: 1.5 }} />
+              <Typography variant="h3" sx={{ fontWeight: 700, color: 'var(--info)', mb: 0.5 }}>
+                {society.total_units}
+              </Typography>
+              <Typography variant="subtitle2" sx={{ color: 'var(--text-secondary)', fontWeight: 500 }}>
+                Total Units
+              </Typography>
+            </Box>
+          </Grid>
+
+          {/* Registration Date Card */}
+          <Grid item xs={12} sm={6} md={4}>
+            <Box sx={{ 
+              p: 3, 
+              height: '180px',
+              width: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              position: 'relative',
+              bgcolor: 'var(--color-card)', 
+              borderRadius: 'var(--border-radius)',
+              border: '1px solid var(--color-border-light)',
+              boxShadow: 'var(--shadow-sm)',
+              transition: 'all var(--transition-normal)',
+              textAlign: 'center',
+              '&:hover': {
+                transform: 'translateY(-2px)',
+                boxShadow: 'var(--shadow-lg)',
+                borderColor: 'var(--accent-color)'
+              }
+            }}>
+              {/* Edit Icon */}
+              <Box sx={{ 
+                position: 'absolute', 
+                top: 12, 
+                right: 12,
+                cursor: 'pointer',
+                p: 0.5,
+                borderRadius: '50%',
+                '&:hover': {
+                  bgcolor: 'rgba(var(--primary-rgb), 0.1)'
+                }
+              }}
+              onClick={() => navigate(`/societies/${society.id}/edit?field=registration_date`)}
+              >
+                <EditIcon sx={{ fontSize: '1.2rem', color: 'var(--text-secondary)' }} />
+              </Box>
+
+              <CalendarMonthIcon sx={{ color: 'var(--accent-color)', fontSize: '2.5rem', mb: 1.5 }} />
+              <Typography variant="h6" sx={{ 
+                fontWeight: 600, 
+                color: 'var(--text-primary)', 
+                mb: 0.5,
+                fontSize: '1rem',
+                textAlign: 'center'
+              }}>
+                {formattedDate}
+              </Typography>
+              <Typography variant="subtitle2" sx={{ color: 'var(--text-secondary)', fontWeight: 500 }}>
+                Registration Date
+              </Typography>
+            </Box>
+          </Grid>
+
+          {/* Registration Number Card */}
+          {society.registration_number && (
+            <Grid item xs={12} sm={6} md={4}>
+              <Box sx={{ 
+                p: 3, 
+                height: '180px',
+                width: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                position: 'relative',
+                bgcolor: 'var(--color-card)', 
+                borderRadius: 'var(--border-radius)',
+                border: '1px solid var(--color-border-light)',
+                boxShadow: 'var(--shadow-sm)',
+                transition: 'all var(--transition-normal)',
+                textAlign: 'center',
+                '&:hover': {
+                  transform: 'translateY(-2px)',
+                  boxShadow: 'var(--shadow-lg)',
+                  borderColor: 'var(--warning)'
+                }
+              }}>
+                {/* Edit Icon */}
+                <Box sx={{ 
+                  position: 'absolute', 
+                  top: 12, 
+                  right: 12,
+                  cursor: 'pointer',
+                  p: 0.5,
+                  borderRadius: '50%',
+                  '&:hover': {
+                    bgcolor: 'rgba(var(--primary-rgb), 0.1)'
+                  }
+                }}
+                onClick={() => navigate(`/societies/${society.id}/edit?field=registration_number`)}
+                >
+                  <EditIcon sx={{ fontSize: '1.2rem', color: 'var(--text-secondary)' }} />
+                </Box>
+
+                <AssignmentIcon sx={{ color: 'var(--warning)', fontSize: '2.5rem', mb: 1.5 }} />
+                <Typography variant="h6" sx={{ 
+                  fontWeight: 600, 
+                  color: 'var(--text-primary)', 
+                  mb: 0.5,
+                  fontSize: '1rem',
+                  textAlign: 'center',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  maxWidth: '80%'
+                }}>
+                  {society.registration_number}
+                </Typography>
+                <Typography variant="subtitle2" sx={{ color: 'var(--text-secondary)', fontWeight: 500 }}>
+                  Registration Number
+                </Typography>
+              </Box>
+            </Grid>
+          )}
+        </Grid>
 
         {/* Finances summary section if available */}
         {financesSummary && (
@@ -342,14 +580,17 @@ const SocietyDetails: React.FC = () => {
 
         <Box sx={{ mt: 4, display: 'flex', gap: 2 }}>
           <Button 
-            className="modern-button"
             variant="contained"
+            color="primary"
             sx={{ 
-              background: 'linear-gradient(45deg, var(--primary-color), var(--secondary-color))',
+              height: '40px',
+              width: { xs: '100%', md: 'auto' },
+              borderRadius: 'var(--border-radius)',
+              textTransform: 'none',
               fontWeight: 600,
+              boxShadow: 'var(--shadow-sm)',
               '&:hover': {
-                background: 'linear-gradient(45deg, var(--secondary-color), var(--primary-color))',
-                transform: 'translateY(-2px)'
+                boxShadow: 'var(--shadow-md)'
               }
             }}
             onClick={() => navigate(`/societies/${society.id}/residents`)}
@@ -358,15 +599,18 @@ const SocietyDetails: React.FC = () => {
           </Button>
           
           <Button 
-            className="modern-button"
             variant="outlined"
             sx={{ 
-              borderColor: 'var(--secondary-color)',
-              color: 'var(--secondary-color)',
+              height: '40px',
+              width: { xs: '100%', md: 'auto' },
+              borderRadius: 'var(--border-radius)',
+              textTransform: 'none',
               fontWeight: 600,
+              color: 'var(--text-secondary)',
+              borderColor: 'var(--color-border-light)',
               '&:hover': {
-                borderColor: 'var(--primary-color)',
                 color: 'var(--primary-color)',
+                borderColor: 'var(--primary-color)',
                 background: 'rgba(var(--primary-rgb), 0.05)'
               }
             }}

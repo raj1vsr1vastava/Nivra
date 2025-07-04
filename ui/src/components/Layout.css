@@ -1,0 +1,159 @@
+/* Layout Component Styling */
+
+/* Main layout container */
+.layout-root {
+  display: flex;
+}
+
+/* Navigation drawer container */
+.layout-nav-container {
+  width: 240px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 959px) {
+  .layout-nav-container {
+    width: auto;
+  }
+}
+
+/* Mobile drawer styling */
+.layout-mobile-drawer {
+  display: block;
+}
+
+@media (min-width: 960px) {
+  .layout-mobile-drawer {
+    display: none;
+  }
+}
+
+.layout-mobile-drawer .MuiDrawer-paper {
+  box-sizing: border-box;
+  width: 240px;
+  background-color: #F2E5D5 !important;
+  color: #2C5F5D !important;
+}
+
+/* Desktop drawer styling */
+.layout-desktop-drawer {
+  display: none;
+}
+
+@media (min-width: 960px) {
+  .layout-desktop-drawer {
+    display: block;
+  }
+}
+
+.layout-desktop-drawer .MuiDrawer-paper {
+  box-sizing: border-box;
+  width: 240px;
+  background-color: #F2E5D5 !important;
+  color: #2C5F5D !important;
+  border-right: 1px solid rgba(44, 95, 93, 0.2) !important;
+}
+
+/* Drawer content styling */
+.layout-drawer-list {
+  overflow-y: auto !important;
+}
+
+/* Hide the top divider to merge sidebar with header */
+.layout-desktop-drawer .MuiDivider-root:first-of-type,
+.layout-mobile-drawer .MuiDivider-root:first-of-type {
+  display: none !important;
+}
+
+.layout-menu-divider {
+  margin: 8px 0 !important;
+}
+
+.layout-menu-item-button {
+  padding-left: 16px !important;
+  padding-top: 9.6px !important;
+  padding-bottom: 9.6px !important;
+}
+
+.layout-menu-item-button.indent {
+  padding-left: 32px !important;
+}
+
+/* Main content area - ensure proper spacing from fixed header */
+.layout-main-content {
+  /* Standard MUI toolbar height is 56px mobile, 64px desktop */
+  /* But we need to account for our custom header that may be taller */
+  margin-top: 64px; /* Desktop header height */
+  background-color: #F5EDE0; /* 1 shade darker than previous (#F8F2E8) */
+  flex-grow: 1;
+  padding: 16px;
+  min-height: calc(100vh - 64px);
+  display: flex;
+  flex-direction: column;
+  width: calc(100% - 240px);
+}
+
+@media (max-width: 599px) {
+  .layout-main-content {
+    margin-top: 56px; /* Mobile header height */
+    padding: 8px;
+    min-height: calc(100vh - 56px);
+  }
+}
+
+@media (max-width: 959px) {
+  .layout-main-content {
+    width: 100%;
+  }
+}
+
+@media (min-width: 600px) and (max-width: 959px) {
+  .layout-main-content {
+    padding: 16px;
+  }
+}
+
+/* Ensure no overlap with fixed header */
+.layout-container {
+  padding-top: 0 !important; /* Remove top padding since we're using margin-top */
+  background-color: #F5EDE0; /* Match main content background */
+  flex-grow: 1;
+  padding-bottom: 0 !important;
+}
+
+/* Smooth transition for header changes */
+.layout-main-content {
+  transition: margin-top 0.3s ease;
+}
+
+/* Side Navigation Bar - Match header background */
+.layout-sidebar {
+  background-color: #F2E5D5 !important; /* Match header background */
+}
+
+/* Override MUI Drawer paper background with more specific selectors */
+.MuiDrawer-paper {
+  background-color: #F2E5D5 !important;
+}
+
+.MuiDrawer-paper.MuiPaper-root {
+  background-color: #F2E5D5 !important;
+}
+
+/* Target both temporary and permanent drawers */
+.MuiDrawer-root .MuiDrawer-paper {
+  background-color: #F2E5D5 !important;
+}
+
+/* Ensure navigation items have proper contrast */
+.layout-nav-item {
+  color: #2C5F5D !important;
+}
+
+.layout-nav-item:hover {
+  background-color: rgba(44, 95, 93, 0.1) !important;
+}
+
+.layout-nav-item.selected {
+  background-color: rgba(44, 95, 93, 0.15) !important;
+}

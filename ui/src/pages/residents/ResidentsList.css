@@ -11,30 +11,23 @@
 
 .residents-header {
   display: flex;
-  flex-direction: column;
-  gap: 16px;
-  align-items: flex-start;
-  margin-bottom: 24px; /* Consistent with societies */
+  align-items: center;
+  margin-bottom: 24px;
   position: relative;
-  padding: 0 8px; /* Added horizontal padding */
+  padding: 0 8px;
 }
 
 .residents-header-title {
-  margin: 4px 0;
+  flex-grow: 1;
+  margin: 0 0 2px 0;
   font-size: 1.75rem;
   font-weight: 700;
   color: var(--text-primary);
   position: relative;
-  padding-bottom: 4px; /* Add a bit of padding below the title */
+  padding-bottom: 4px;
 }
 
-@media (min-width: 768px) {
-  .residents-header {
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-  }
-}
+/* Removed responsive media query to maintain consistent left-aligned layout */
 
 /* Removed residents-filters as it will be integrated in the header like societies */
 

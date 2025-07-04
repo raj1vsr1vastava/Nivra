@@ -1,23 +1,62 @@
-.resident-detail-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 24px;
+/* Resident Details Page Styles */
+@import '../../styles/theme.css';
+
+.resident-details-container {
+  padding: 16px 0; /* Match SocietiesList padding */
+  min-height: 100vh;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-.resident-info-section {
-  margin-bottom: 24px;
+.resident-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24px; /* Match SocietiesList margin */
+  position: relative;
+  padding: 0 8px; /* Match SocietiesList padding */
+}
+
+.resident-header-title {
+  flex-grow: 1;
+  margin: 4px 0; /* Match SocietiesList margin */
+  font-size: 1.75rem; /* Match SocietiesList font size */
+  font-weight: 700;
+  color: var(--text-primary);
+  position: relative;
+  padding-bottom: 4px; /* Match SocietiesList padding */
+}
+
+.resident-info-card {
+  padding: 24px;
+  margin-bottom: 32px;
+  background-color: white;
+  border-radius: var(--border-radius);
+  box-shadow: var(--card-shadow);
+  transition: var(--transition);
+}
+
+.resident-info-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
 }
 
 .resident-info-item {
   display: flex;
   align-items: center;
   margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .resident-info-icon {
-  margin-right: 8px;
-  color: var(--text-secondary);
+  margin-right: 16px;
+  color: var(--primary-color);
+  background-color: rgba(58, 134, 255, 0.1);
+  padding: 8px;
+  border-radius: 50%;
+}
+.finances-summary-section {
+  margin-bottom: 2rem;
 }
 
 .transaction-status {
@@ -51,12 +90,23 @@
   box-shadow: var(--card-shadow);
 }
 
+.positive-balance {
+  color: #4caf50; /* success.main */
+}
+
+.negative-balance {
+  color: #f44336; /* error.main */
+}
+
 @media (max-width: 600px) {
-  .resident-detail-header {
+  .resident-header {
     flex-direction: column;
+    align-items: flex-start;
   }
   
-  .resident-detail-header button {
+  .resident-header button:last-child {
     margin-top: 16px;
+    margin-left: 0 !important;
+    width: 100%;
   }
 }

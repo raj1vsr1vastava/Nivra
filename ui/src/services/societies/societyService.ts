@@ -80,8 +80,15 @@ const societyService = {
 
   // Update society
   updateSociety: async (societyId: string | number, societyData: Partial<SocietyData>): Promise<SocietyData> => {
-    const response = await apiClient.put(`/societies/${societyId}`, societyData);
-    return response.data;
+    console.log(`Calling PUT /societies/${societyId} with data:`, societyData);
+    try {
+      const response = await apiClient.put(`/societies/${societyId}`, societyData);
+      console.log('Society update API response:', response);
+      return response.data;
+    } catch (error) {
+      console.error('Society update API error:', error);
+      throw error;
+    }
   },
 
   // Delete society

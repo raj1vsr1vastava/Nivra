@@ -1,30 +1,118 @@
 /* Header Component Styling - MUI Compatible */
+.MuiAppBar-root {
+  background-color: #F2E5D5 !important;
+  color: #2C5F5D !important;
+  width: 100% !important;
+  box-shadow: none !important;
+  transition: box-shadow 0.3s ease !important;
+  z-index: 1300 !important;
+  position: fixed !important;
+  border: none !important;
+}
+
 .MuiAppBar-root.scrolled {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+  box-shadow: none !important;
+  background-color: #F2E5D5 !important;
 }
 
-.nav-container {
+/* Override Material-UI AppBar background specifically */
+.MuiAppBar-root.MuiAppBar-colorPrimary {
+  background-color: #F2E5D5 !important;
+}
+
+.MuiAppBar-root .MuiToolbar-root {
+  background-color: #F2E5D5 !important;
+  color: #2C5F5D !important;
+}
+
+/* Nivra Logo Styling */
+.nivra-logo {
+  height: 64px;
+  width: 64px;
+  margin-right: 8px;
+  object-fit: contain;
+}
+
+/* Header Logo and Title Container */
+.header-logo-container {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 16px 24px;
 }
 
-.logo {
+/* Header Title Styling */
+.header-title {
+  text-decoration: none !important;
+  color: #2C5F5D !important;
+  font-weight: bold !important;
+  font-size: 2rem !important;
+}
+
+.header-title:hover {
+  color: #2C5F5D !important;
+}
+
+/* Spacer */
+.header-spacer {
+  flex-grow: 1;
+}
+
+/* User Profile Container */
+.header-user-profile {
   display: flex;
   align-items: center;
+  text-decoration: none;
+  color: #2C5F5D;
 }
 
-.logo h2 {
-  font-size: 24px;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin: 0;
+.header-user-profile:hover {
+  color: #2C5F5D;
 }
 
+/* User Avatar Styling */
+.header-user-avatar {
+  width: 32px !important;
+  height: 32px !important;
+  background-color: #2C5F5D !important;
+  color: white !important;
+}
+
+/* User Info Container */
+.header-user-info {
+  margin-left: 8px;
+  display: block;
+}
+
+.header-user-name {
+  font-weight: bold !important;
+  line-height: 1.2 !important;
+  color: #2C5F5D !important;
+}
+
+.header-user-role {
+  color: #5A9B97 !important;
+  line-height: 1 !important;
+}
+
+/* Mobile Menu Button */
+.header-mobile-menu {
+  margin-right: 16px !important;
+  color: #2C5F5D !important;
+}
+
+/* Responsive behavior for user info */
+@media (max-width: 599px) {
+  .header-user-info {
+    display: none !important;
+  }
+}
+
+@media (min-width: 600px) {
+  .header-user-info {
+    display: block !important;
+  }
+}
+
+/* Navigation Menu Styles */
 .nav-menu {
   display: flex;
   align-items: center;
@@ -77,6 +165,7 @@
   color: white;
 }
 
+/* Actions and Hamburger Menu */
 .nav-actions {
   display: flex;
   align-items: center;

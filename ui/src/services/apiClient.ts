@@ -33,6 +33,13 @@ apiClient.interceptors.response.use(
     return response;
   },
   (error: AxiosError) => {
+    console.log('API Client Error:', error);
+    console.log('Error Response Data:', error.response?.data);
+    console.log('Error Config:', error.config);
+    console.log('Request URL:', error.config?.url);
+    console.log('Request Method:', error.config?.method);
+    console.log('Request Data:', error.config?.data);
+    
     // Get error detail from response
     const errorResponse = error.response?.data as any;
     const errorDetail = errorResponse?.detail as ErrorDetail | string | undefined;

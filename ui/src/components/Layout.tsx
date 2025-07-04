@@ -16,6 +16,7 @@ import {
 } from '@mui/material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Header from './Header';
+import './Layout.css';
 
 // Icons
 import HomeIcon from '@mui/icons-material/Home';
@@ -71,10 +72,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     <>
       <Toolbar /> {/* Always include Toolbar for both mobile and desktop to reserve space for the header */}
       <Divider />
-      <List sx={{ overflowY: 'auto' }}>
+      <List className="layout-drawer-list">
         {menuItems.map((item, index) => (
           item.divider ? (
-            <Divider key={`divider-${index}`} sx={{ my: 1 }} />
+            <Divider key={`divider-${index}`} className="layout-menu-divider" />
           ) : (
             <ListItem key={item.text} disablePadding>
               <ListItemButton 
@@ -87,10 +88,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                     }
                   }
                 }}
-                sx={{
-                  pl: item.indent ? 4 : 2,
-                  py: 1.2 // Add more padding vertically to make items easier to click
-                }}
+                className={`layout-menu-item-button ${item.indent ? 'indent' : ''}`}
               >
                 <ListItemIcon>
                   {item.icon}
@@ -105,7 +103,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   );
 
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box className="layout-root">
       <CssBaseline />
       
       {/* App bar */}
@@ -116,26 +114,15 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       />
       
       {/* Navigation drawer */}
-      <Box
-        component="nav"
-        sx={{ width: { md: drawerWidth }, flexShrink: { md: 0 } }}
-      >
+      <Box component="nav" className="layout-nav-container">
         {/* Mobile drawer */}
         <Drawer
           variant="temporary"
           open={mobileOpen}
           onClose={handleDrawerToggle}
+          className="layout-mobile-drawer"
           ModalProps={{
             keepMounted: true, // Better open performance on mobile.
-          }}
-          sx={{
-            display: { xs: 'block', md: 'none' },
-            '& .MuiDrawer-paper': { 
-              boxSizing: 'border-box', 
-              width: drawerWidth,
-              backgroundColor: 'var(--bg-light)',
-              color: 'var(--text-primary)'
-            },
           }}
         >
           {drawer}
@@ -144,16 +131,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         {/* Desktop drawer */}
         <Drawer
           variant="permanent"
-          sx={{
-            display: { xs: 'none', md: 'block' },
-            '& .MuiDrawer-paper': { 
-              boxSizing: 'border-box', 
-              width: drawerWidth,
-              backgroundColor: 'var(--bg-light)',
-              color: 'var(--text-primary)',
-              borderRight: '1px solid var(--divider)'
-            },
-          }}
+          className="layout-desktop-drawer"
           open
         >
           {drawer}
@@ -161,20 +139,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       </Box>
       
       {/* Main content */}
-      <Box
-        component="main"
-        sx={{ 
-          flexGrow: 1, 
-          p: { xs: 1, sm: 2, md: 2 }, /* Reduced padding from p: 3 */
-          width: { md: `calc(100% - ${drawerWidth}px)` },
-          backgroundColor: 'var(--bg-main)',
-          minHeight: '100vh',
-          display: 'flex',
-          flexDirection: 'column'
-        }}
-      >
-        <Toolbar /> {/* Space reserved for header */}
-        <Container maxWidth="lg" sx={{ flexGrow: 1, py: 0 /* Removed vertical padding */ }}>
+      <Box component="main" className="layout-main-content">
+        <Container maxWidth="lg" className="layout-container">
           {children}
         </Container>
       </Box>

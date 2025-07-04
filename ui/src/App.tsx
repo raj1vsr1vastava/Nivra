@@ -4,8 +4,10 @@ import { ThemeProvider } from '@mui/material';
 import Layout from './components/Layout';
 import SocietiesList from './pages/societies/SocietiesList';
 import SocietyDetails from './pages/societies/SocietyDetails';
+import SocietyEdit from './pages/societies/SocietyEdit';
 import ResidentsList from './pages/residents/ResidentsList';
 import ResidentDetails from './pages/residents/ResidentDetails';
+import ResidentEdit from './pages/residents/ResidentEdit';
 import ResidentFinancesList from './pages/finances/ResidentFinancesList';
 import SocietyFinancesList from './pages/expenses/SocietyFinancesList';
 import SettingsIndex from './pages/settings/SettingsIndex';
@@ -24,9 +26,13 @@ const App: React.FC = () => {
           <Routes>
             {/* Main routes */}
             <Route path="/societies" element={<SocietiesList />} />
+            <Route path="/societies/new" element={<SocietyEdit />} />
             <Route path="/societies/:societyId" element={<SocietyDetails />} />
+            <Route path="/societies/:societyId/edit" element={<SocietyEdit />} />
+            <Route path="/societies/:societyId/residents" element={<ResidentsList />} />
             <Route path="/residents" element={<ResidentsList />} />
             <Route path="/residents/:residentId" element={<ResidentDetails />} />
+            <Route path="/residents/:residentId/edit" element={<ResidentEdit />} />
             <Route path="/finances" element={<ResidentFinancesList />} />
             <Route path="/society-finances" element={<SocietyFinancesList />} />
             

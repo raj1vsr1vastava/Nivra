@@ -6,11 +6,9 @@ import {
   IconButton, 
   Typography, 
   Avatar, 
-  Box,
-  useTheme
+  Box
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
-import ApartmentIcon from '@mui/icons-material/Apartment';
 import PersonIcon from '@mui/icons-material/Person';
 import './Header.css';
 
@@ -28,7 +26,6 @@ interface User {
 
 const Header: React.FC<HeaderProps> = ({ drawerWidth, onMenuClick, isMobile }) => {
   const [hasScrolled, setHasScrolled] = useState<boolean>(false);
-  const theme = useTheme();
   
   // Mock user data - in a real app, this would come from authentication context or props
   const currentUser: User = {
@@ -54,29 +51,9 @@ const Header: React.FC<HeaderProps> = ({ drawerWidth, onMenuClick, isMobile }) =
     };
   }, []);
 
-  // User menu state
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
-  
-  const handleUserMenuClick = (event: React.MouseEvent<HTMLElement>): void => {
-    setAnchorEl(event.currentTarget);
-  };
-  
-  const handleUserMenuClose = (): void => {
-    setAnchorEl(null);
-  };
-
   return (
     <AppBar
       position="fixed"
-      sx={{
-        width: '100%',
-        boxShadow: hasScrolled ? 3 : 1,
-        transition: 'box-shadow 0.3s ease',
-        zIndex: (theme) => theme.zIndex.drawer + 1,
-        backgroundColor: 'white',
-        color: 'text.primary'
-      }}
       className={hasScrolled ? 'scrolled' : ''}
     >
       <Toolbar>
@@ -86,50 +63,38 @@ const Header: React.FC<HeaderProps> = ({ drawerWidth, onMenuClick, isMobile }) =
             aria-label="open drawer"
             edge="start"
             onClick={onMenuClick}
-            sx={{ mr: 2 }}
+            className="header-mobile-menu"
           >
             <MenuIcon />
           </IconButton>
         )}
         
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <ApartmentIcon sx={{ mr: 1 }} />
+        <Box className="header-logo-container">
+          <img 
+            src="/nivra-logo.png" 
+            alt="Nivra Logo" 
+            className="nivra-logo"
+          />
           <Typography
             variant="h6"
             noWrap
             component={Link}
             to="/"
-            sx={{
-              textDecoration: 'none',
-              color: 'inherit',
-              fontWeight: 'bold'
-            }}
+            className="header-title"
           >
             Nivra
           </Typography>
         </Box>
         
-        <Box sx={{ flexGrow: 1 }} />
+        <Box className="header-spacer" />
         
         {/* User profile */}
         <Box 
           component={Link} 
           to="/profile"
-          sx={{ 
-            display: 'flex', 
-            alignItems: 'center',
-            textDecoration: 'none',
-            color: 'inherit'
-          }}
+          className="header-user-profile"
         >
-          <Avatar 
-            sx={{ 
-              width: 32, 
-              height: 32,
-              backgroundColor: 'primary.main',
-              color: 'white'
-            }}
-          >
+          <Avatar className="header-user-avatar">
             {currentUser.avatar ? (
               <img src={currentUser.avatar} alt={currentUser.name} />
             ) : (
@@ -137,11 +102,11 @@ const Header: React.FC<HeaderProps> = ({ drawerWidth, onMenuClick, isMobile }) =
             )}
           </Avatar>
           
-          <Box sx={{ ml: 1, display: { xs: 'none', sm: 'block' } }}>
-            <Typography variant="subtitle2" sx={{ fontWeight: 'bold', lineHeight: 1.2 }}>
+          <Box className="header-user-info">
+            <Typography variant="subtitle2" className="header-user-name">
               {currentUser.name}
             </Typography>
-            <Typography variant="caption" sx={{ color: 'text.secondary', lineHeight: 1 }}>
+            <Typography variant="caption" className="header-user-role">
               {currentUser.role}
             </Typography>
           </Box>

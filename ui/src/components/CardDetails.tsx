@@ -134,16 +134,35 @@ const CardDetails: React.FC<CardProps> = ({
                   } 
                 } as React.HTMLAttributes<HTMLElement>)
               )}
-              <Typography 
-                variant="body2" 
-                sx={{ 
-                  color: 'var(--text-secondary)',
-                  fontWeight: field.fontWeight || 400
-                }}
-              >
-                {field.label && <span style={{ fontWeight: 500 }}>{field.label}: </span>}
-                {field.value}
-              </Typography>
+              {React.isValidElement(field.value) ? (
+                <>
+                  {field.label && (
+                    <Typography 
+                      variant="body2" 
+                      component="span" 
+                      sx={{ 
+                        color: 'var(--text-secondary)',
+                        fontWeight: 500,
+                        marginRight: '4px'
+                      }}
+                    >
+                      {field.label}: 
+                    </Typography>
+                  )}
+                  {field.value}
+                </>
+              ) : (
+                <Typography 
+                  variant="body2" 
+                  sx={{ 
+                    color: 'var(--text-secondary)',
+                    fontWeight: field.fontWeight || 400
+                  }}
+                >
+                  {field.label && <span style={{ fontWeight: 500 }}>{field.label}: </span>}
+                  {field.value}
+                </Typography>
+              )}
             </Box>
           ))}
           

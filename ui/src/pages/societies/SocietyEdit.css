@@ -1,0 +1,165 @@
+/* Society Edit Page Styles */
+@import '../../styles/theme.css';
+
+.society-edit-container {
+  padding: 16px 0;
+  min-height: 100vh;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.society-edit-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+  position: relative;
+  padding: 0 8px;
+}
+
+.society-edit-header-title {
+  flex-grow: 1;
+  margin: 0 0 2px 0;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  position: relative;
+  padding-bottom: 4px;
+}
+
+.society-edit-form {
+  margin-bottom: 24px;
+}
+
+.society-edit-section {
+  background-color: white;
+  padding: 24px 24px;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 16px;
+}
+
+.society-edit-section-title {
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.society-edit-form-actions {
+  display: flex;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.society-edit-button {
+  height: 40px;
+}
+
+.society-edit-button-cancel {
+  color: var(--text-secondary);
+}
+
+.society-edit-button-cancel:hover {
+  color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.society-edit-loading-container {
+  display: flex;
+  justify-content: center;
+  margin: 40px 0;
+}
+
+.society-edit-loading-spinner {
+  color: var(--primary-color);
+}
+
+.society-edit-error-alert {
+  margin-top: 24px;
+  margin-bottom: 24px;
+  border-radius: var(--border-radius);
+  font-weight: 500;
+}
+
+.society-edit-back-button {
+  height: 40px;
+  color: var(--text-secondary);
+}
+
+.society-edit-back-button:hover {
+  color: var(--primary-color);
+  border-color: var(--primary-color);
+  background: rgba(var(--primary-rgb), 0.05);
+}
+
+.society-edit-container-max-width {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.society-edit-inline-error-alert {
+  margin-bottom: 24px;
+  border-radius: var(--border-radius);
+}
+
+/* Field highlighting styles - simple and stable */
+.society-edit-field-highlighted {
+  position: relative;
+}
+
+.society-edit-field-highlighted .MuiOutlinedInput-root {
+  background-color: rgba(25, 118, 210, 0.08) !important;
+  box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.3) !important;
+}
+
+.society-edit-field-highlighted .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline {
+  border-color: #1976d2 !important;
+  border-width: 2px !important;
+}
+
+.society-edit-field-highlighted .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
+  border-color: #1976d2 !important;
+  border-width: 2px !important;
+}
+
+.society-edit-field-highlighted .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: #1976d2 !important;
+  border-width: 2px !important;
+}
+
+/* Text field group styles */
+.society-edit-text-field {
+  margin-bottom: 6px;
+}
+
+.society-edit-text-field .MuiOutlinedInput-root {
+  transition: all 0.3s ease;
+}
+
+.society-edit-text-field .MuiOutlinedInput-root:hover {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+.society-edit-text-field .MuiOutlinedInput-root.Mui-focused {
+  background-color: rgba(25, 118, 210, 0.05);
+}
+
+/* Additional spacing for form sections */
+.society-edit-form .MuiGrid-container {
+  margin-top: 4px;
+}
+
+.society-edit-form .MuiGrid-item {
+  padding-bottom: 12px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .society-edit-form-actions {
+    flex-direction: column;
+  }
+  
+  .society-edit-button {
+    width: 100%;
+  }
+}

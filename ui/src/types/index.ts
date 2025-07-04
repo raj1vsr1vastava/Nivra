@@ -65,9 +65,24 @@ export interface SocietyData {
 export interface ResidentData {
   id: string | number;
   name: string;
+  first_name: string;
+  last_name: string;
   unit?: string | number;
+  unit_number?: string;
   contact?: string;
-  // Add other resident properties as needed
+  email?: string;
+  phone?: string;
+  society_id: string | number;
+  society_name?: string;
+  is_owner: boolean;
+  is_committee_member: boolean;
+  is_active: boolean;
+  committee_role?: string;
+  joined_date?: string;
+  lease_end_date?: string;
+  emergency_contact?: string;
+  emergency_phone?: string;
+  notes?: string;
 }
 
 export interface FinanceData {
