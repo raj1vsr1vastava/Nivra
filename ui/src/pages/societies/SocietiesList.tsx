@@ -15,6 +15,7 @@ import EmailIcon from '@mui/icons-material/Email';
 import PhoneIcon from '@mui/icons-material/Phone';
 import { useNavigate } from 'react-router-dom';
 import { SocietyData } from '../../types';
+import '../../styles/shared-headers.css';
 import './SocietiesList.css';
 
 interface Society extends SocietyData {
@@ -79,12 +80,14 @@ const SocietiesList: React.FC = () => {
   return (
     <div className="societies-container">
       <Container maxWidth="xl" className="societies-container-max-width">
-        <div className="societies-header">
-          <h1 className="societies-header-title">
-            Housing Societies
-          </h1>
-          <Box className="societies-header-actions">
-            <Box className="societies-search-container">
+        <div className="page-header">
+          <div className="page-title-section">
+            <h1 className="page-header-title">
+              Housing Societies
+            </h1>
+          </div>
+          <Box className="page-header-controls">
+            <Box className="page-search-container">
               <TextField
                 className="search-field"
                 fullWidth
@@ -103,7 +106,7 @@ const SocietiesList: React.FC = () => {
               color="primary" 
               startIcon={<AddIcon />}
               onClick={handleAddSociety}
-              className="societies-add-button"
+              className="page-add-button"
             >
               Add Society
             </Button>

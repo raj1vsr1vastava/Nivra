@@ -2,53 +2,56 @@
 
 /* Resident Finances List Page Styles */
 .finances-container {
-  padding: 24px 24px 24px 0; /* Reduced left padding */
-  background-color: var(--light-bg);
+  padding: 16px 0;
+  min-height: 100vh;
   width: 100%;
   box-sizing: border-box;
 }
 
-.finances-header {
+.finances-container-max-width {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* Loading and Error States */
+.finances-loading-container {
   display: flex;
+  justify-content: center;
   align-items: center;
-  margin-bottom: 24px;
-  position: relative;
-  padding-left: 24px; /* Add left padding to header only */
+  min-height: 60vh;
 }
 
-.finances-header-title {
-  flex-grow: 1;
-  font-weight: 700;
-  position: relative;
+.finances-loading-spinner {
+  color: var(--primary-color);
 }
 
-/* .finances-header-title::after {
-  content: '';
-  position: absolute;
-  bottom: -8px;
-  left: 0;
-  width: 60px;
-  height: 4px;
-  background: var(--primary-color);
-  border-radius: 2px;
-} */
-
-.filters-container {
+.finances-error-alert {
   margin-bottom: 24px;
-  padding: 20px;
-  background-color: white;
-  border-radius: var(--border-radius);
-  box-shadow: var(--card-shadow);
+  border-radius: 12px;
+  font-weight: 500;
+}
+
+/* Summary Cards Container */
+.summary-cards-container {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+
+.summary-card-wrapper {
+  flex: 1 1 200px;
+  min-width: 200px;
 }
 
 .summary-card {
   height: 100%;
   padding: 24px;
   text-align: center;
-  background-color: white;
   border-radius: var(--border-radius);
   box-shadow: var(--card-shadow);
   transition: var(--transition);
+  color: white;
 }
 
 .summary-card:hover {
@@ -56,23 +59,108 @@
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
 }
 
+.summary-card-total {
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)) !important;
+}
+
+.summary-card-paid {
+  background: linear-gradient(135deg, #4caf50, #66bb6a) !important;
+}
+
+.summary-card-pending {
+  background: linear-gradient(135deg, #ff9800, #ffb74d) !important;
+}
+
+.summary-card-overdue {
+  background: linear-gradient(135deg, #f44336, #e57373) !important;
+}
+
 .summary-amount {
   font-size: 2rem;
   font-weight: 700;
   margin: 12px 0;
-  background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: white;
 }
 
 .summary-label {
-  color: var(--text-secondary);
+  color: rgba(255, 255, 255, 0.9);
   font-size: 1rem;
   font-weight: 500;
   margin-top: 8px;
 }
 
+/* Filters Container */
+.filters-container {
+  margin-bottom: 24px;
+  border-radius: var(--border-radius);
+  box-shadow: var(--card-shadow);
+  background-color: rgba(255, 255, 255, 0.05);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.filters-header {
+  padding: 20px 20px 0 20px;
+}
+
+.filters-title {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.filters-icon {
+  margin-right: 8px;
+  color: var(--primary-color);
+}
+
+/* Filters Layout */
+.filters-grid {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 0 20px 20px 20px;
+}
+
+.filter-item {
+  flex: 1 1 150px;
+  min-width: 150px;
+}
+
+.filter-item:first-child,
+.filter-item:nth-child(2) {
+  flex: 1 1 200px;
+  min-width: 200px;
+}
+
+/* Search Field */
+.search-field {
+  border-radius: var(--border-radius);
+}
+
+.search-icon {
+  color: var(--text-secondary);
+  margin-right: 8px;
+}
+
+/* Reset Filters Button */
+.reset-filters-button {
+  border-radius: var(--border-radius);
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+  transition: var(--transition);
+}
+
+.reset-filters-button:hover {
+  background-color: rgba(var(--primary-rgb), 0.1);
+  border-color: var(--primary-color);
+}
+
+/* Status Chip Styles */
 .status-pending {
   background-color: rgba(var(--warning-rgb, 255, 190, 11), 0.15);
   color: var(--warning, #ffbe0b);
@@ -113,12 +201,16 @@
   display: inline-block;
 }
 
+/* Table Container */
 .table-container {
   margin-top: 24px;
   overflow-x: auto;
-  background-color: white;
   border-radius: var(--border-radius);
   box-shadow: var(--card-shadow);
+  background-color: rgba(255, 255, 255, 0.05);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .table-container table {
@@ -127,11 +219,17 @@
 
 .table-container th {
   font-weight: 600;
-  background-color: rgba(var(--primary-rgb, 58, 134, 255), 0.05);
+  background-color: rgba(var(--primary-rgb, 58, 134, 255), 0.1);
+  color: var(--text-primary);
 }
 
 .table-container tbody tr:hover {
-  background-color: rgba(var(--primary-rgb, 58, 134, 255), 0.03);
+  background-color: rgba(var(--primary-rgb, 58, 134, 255), 0.08);
+}
+
+.table-container tbody td {
+  color: var(--text-primary);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .table-actions {
@@ -158,18 +256,54 @@
   color: var(--text-secondary);
 }
 
-.finance-action-button {
-  border-radius: var(--border-radius);
-  text-transform: none;
-  font-weight: 500;
-  transition: var(--transition);
+/* Responsive Design */
+@media (max-width: 768px) {
+  .summary-cards-container {
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .summary-card-wrapper {
+    min-width: 100%;
+  }
+  
+  .filters-grid {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .filter-item {
+    min-width: 100%;
+    flex: 1 1 100%;
+  }
+  
+  .summary-card {
+    padding: 16px;
+  }
+  
+  .summary-amount {
+    font-size: 1.5rem;
+  }
 }
 
-.search-field {
-  border-radius: var(--border-radius);
-  transition: var(--transition);
-}
-
-.search-field:focus {
-  border-color: var(--primary-color);
+@media (max-width: 480px) {
+  .finances-container {
+    padding: 16px 8px;
+  }
+  
+  .summary-card {
+    padding: 16px;
+  }
+  
+  .summary-amount {
+    font-size: 1.5rem;
+  }
+  
+  .filters-header {
+    padding: 16px 16px 0 16px;
+  }
+  
+  .filters-grid {
+    padding: 0 16px 16px 16px;
+  }
 }

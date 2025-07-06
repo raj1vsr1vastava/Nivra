@@ -1,0 +1,237 @@
+/* Society Selection Page Styles */
+@import '../../styles/theme.css';
+
+.society-selection-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #F2E5D5 0%, #F8F2E8 50%, #E8DCC6 100%);
+  padding: 24px 0;
+}
+
+.society-selection-paper {
+  padding: 32px !important;
+  border-radius: 16px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
+  background: rgba(255, 255, 255, 0.95) !important;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+
+.society-selection-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.society-selection-title {
+  color: #2C5F5D !important;
+  font-weight: 700 !important;
+  margin-bottom: 16px !important;
+}
+
+.society-selection-subtitle {
+  color: #5A9B97 !important;
+  font-weight: 500 !important;
+  margin-bottom: 0 !important;
+}
+
+.society-selection-alert {
+  margin-bottom: 24px !important;
+  border-radius: 12px !important;
+}
+
+.society-search-container {
+  margin-bottom: 32px;
+}
+
+.society-search-field .MuiOutlinedInput-root {
+  border-radius: 12px !important;
+  background-color: rgba(248, 248, 248, 0.8);
+}
+
+.society-search-field .MuiOutlinedInput-root:hover {
+  background-color: rgba(248, 248, 248, 1);
+}
+
+.society-search-field .MuiOutlinedInput-root.Mui-focused {
+  background-color: white;
+  box-shadow: 0 0 0 3px rgba(44, 95, 93, 0.1);
+}
+
+.society-search-icon {
+  color: #5A9B97 !important;
+  margin-right: 8px;
+}
+
+.societies-grid {
+  margin-top: 24px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 24px;
+}
+
+.society-card-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.society-card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  border-radius: 16px !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08) !important;
+  transition: all 0.3s ease !important;
+  border: 1px solid rgba(44, 95, 93, 0.1) !important;
+}
+
+.society-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12) !important;
+}
+
+.society-card-title {
+  color: #2C5F5D !important;
+  font-weight: 600 !important;
+  margin-bottom: 12px !important;
+}
+
+.society-card-address {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
+
+.society-card-icon {
+  color: #5A9B97 !important;
+  font-size: 16px !important;
+  margin-right: 8px;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.society-card-address-text {
+  color: #666 !important;
+  line-height: 1.4 !important;
+}
+
+.society-card-details {
+  margin-bottom: 16px;
+}
+
+.society-card-stats {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.society-card-chip {
+  background-color: rgba(44, 95, 93, 0.1) !important;
+  color: #2C5F5D !important;
+  font-weight: 500 !important;
+  font-size: 0.75rem !important;
+}
+
+.society-card-chip.available {
+  background-color: rgba(76, 175, 80, 0.1) !important;
+  color: #4CAF50 !important;
+}
+
+.society-card-actions {
+  margin-top: auto;
+  padding: 16px !important;
+  padding-top: 0 !important;
+}
+
+.society-join-button {
+  background: linear-gradient(135deg, #2C5F5D 0%, #5A9B97 100%) !important;
+  color: white !important;
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+  text-transform: none !important;
+  padding: 8px 16px !important;
+  box-shadow: 0 4px 12px rgba(44, 95, 93, 0.3) !important;
+  transition: all 0.3s ease !important;
+}
+
+.society-join-button:hover {
+  background: linear-gradient(135deg, #1E4240 0%, #4A8B87 100%) !important;
+  box-shadow: 0 6px 16px rgba(44, 95, 93, 0.4) !important;
+  transform: translateY(-1px);
+}
+
+.society-join-button:disabled {
+  background: linear-gradient(135deg, rgba(44, 95, 93, 0.5) 0%, rgba(90, 155, 151, 0.5) 100%) !important;
+  box-shadow: 0 2px 8px rgba(44, 95, 93, 0.2) !important;
+  transform: none;
+}
+
+.no-societies-message {
+  text-align: center;
+  padding: 48px 16px;
+}
+
+.join-request-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .society-selection-container {
+    padding: 16px 0;
+  }
+  
+  .society-selection-paper {
+    padding: 24px 16px !important;
+    margin: 8px;
+  }
+  
+  .society-selection-title {
+    font-size: 1.75rem !important;
+  }
+  
+  .societies-grid {
+    margin-top: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .society-selection-paper {
+    padding: 16px 12px !important;
+  }
+  
+  .society-selection-title {
+    font-size: 1.5rem !important;
+  }
+  
+  .society-card-stats {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* Animation */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.society-card {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.society-card:nth-child(2) {
+  animation-delay: 0.1s;
+}
+
+.society-card:nth-child(3) {
+  animation-delay: 0.2s;
+}

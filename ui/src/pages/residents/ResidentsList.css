@@ -9,30 +9,57 @@
   box-sizing: border-box;
 }
 
-.residents-header {
+/* Container without padding */
+.residents-container .no-padding {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* Loading state */
+.residents-loading {
   display: flex;
-  align-items: center;
-  margin-bottom: 24px;
-  position: relative;
-  padding: 0 8px;
+  justify-content: center;
+  margin: 32px 0;
 }
 
-.residents-header-title {
-  flex-grow: 1;
-  margin: 0 0 2px 0;
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: var(--text-primary);
-  position: relative;
-  padding-bottom: 4px;
+/* Error state */
+.residents-error {
+  margin-top: 16px;
 }
 
-/* Removed responsive media query to maintain consistent left-aligned layout */
+/* Residents grid */
+.residents-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); /* Reverted to original size */
+  gap: 12px; /* Reverted to original gap */
+  margin-top: 16px;
+  padding: 0;
+}
 
-/* Removed residents-filters as it will be integrated in the header like societies */
+@media (min-width: 576px) {
+  .residents-grid {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); /* Reverted to original size */
+    gap: 16px; /* Reverted to original gap */
+  }
+}
 
-/* Removed resident-card styling since we're now using the CardList component */
+@media (min-width: 768px) {
+  .residents-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Reverted to original size */
+    gap: 16px; /* Reverted to original gap */
+  }
+}
 
+/* Form controls */
+.residents-form-control {
+  height: 40px;
+}
+
+.residents-select {
+  height: 40px;
+}
+
+/* No residents state */
 .no-residents {
   text-align: center;
   padding: 2.5rem;
@@ -59,4 +86,49 @@
     width: 100%;
     margin-bottom: 16px;
   }
+}
+
+/* Dialog error styling */
+.dialog-error {
+  margin-top: 8px;
+  margin-bottom: 8px;
+  padding: 8px;
+  background-color: rgba(var(--error-rgb), 0.1);
+  border-radius: var(--border-radius);
+}
+
+.dialog-error-text {
+  color: var(--error);
+  font-size: 0.875rem;
+}
+
+/* Search field input styling */
+.search-field .MuiOutlinedInput-root {
+  border-radius: var(--border-radius);
+  height: 40px;
+  font-size: 0.875rem;
+}
+
+/* Search icon */
+.search-icon {
+  margin-right: 4px;
+}
+
+/* Dialog grid */
+.dialog-grid {
+  margin-top: 8px;
+}
+
+/* Icon-only action buttons */
+.icon-action-button {
+  min-width: 40px; /* Reverted to original width */
+  width: 40px;
+  height: 32px; /* Reverted to original height */
+  padding: 4px; /* Reverted to original padding */
+  margin-left: auto;
+}
+
+.icon-action-button:hover {
+  background-color: rgba(var(--primary-rgb), 0.1);
+  color: var(--primary-color);
 }

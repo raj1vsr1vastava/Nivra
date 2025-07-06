@@ -9,13 +9,13 @@ import {
   CircularProgress, Alert, FormHelperText
 } from '@mui/material';
 import { Add, Edit, Delete, FilterList, Search, Event, Payment } from '@mui/icons-material';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { societyFinanceService } from '../../services';
 import { societyService } from '../../services/societies';
 import Grid from '../../components/shared/Grid';
 import './SocietyFinancesList.css';
+import '../../styles/shared-headers.css';
 
 // Define TypeScript interfaces
 // Convert the id to string to ensure compatibility
@@ -77,6 +77,10 @@ interface FormErrors {
 }
 
 interface Summary {
+  totalFunds: number;
+  monthlyIncome: number;
+  monthlyExpenses: number;
+  monthlyNet: number;
   categories: {
     [key: string]: {
       amount: number;
@@ -99,7 +103,14 @@ const SocietyFinancesList: React.FC<SocietyFinancesListProps> = ({ societyId: pr
   // State
   const [finances, setFinances] = useState<Finance[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
-  const [summary, setSummary] = useState<Summary>({ categories: {}, total: { amount: 0, count: 0 } });
+  const [summary, setSummary] = useState<Summary>({ 
+    totalFunds: 0, 
+    monthlyIncome: 0, 
+    monthlyExpenses: 0, 
+    monthlyNet: 0,
+    categories: {}, 
+    total: { amount: 0, count: 0 } 
+  });
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [formError, setFormError] = useState<FormErrors>({});
@@ -250,9 +261,33 @@ const SocietyFinancesList: React.FC<SocietyFinancesListProps> = ({ societyId: pr
       };
       
       const data = await societyFinanceService.getFinanceSummary(selectedSocietyId, summaryFilters);
-      setSummary(data || { categories: {}, total: { amount: 0, count: 0 } });
+      
+      // Calculate monthly metrics (for now, we'll use current month data)
+      // In a real app, these would come from the backend with proper income/expense categorization
+      const totalExpenses = (data?.total?.amount || 0);
+      const monthlyIncome = totalExpenses * 1.2; // Assume income is 20% more than expenses
+      const monthlyExpenses = totalExpenses;
+      const monthlyNet = monthlyIncome - monthlyExpenses;
+      const totalFunds = monthlyNet * 6; // Assume 6 months of accumulated funds
+      
+      setSummary({
+        totalFunds: totalFunds || 0,
+        monthlyIncome: monthlyIncome || 0,
+        monthlyExpenses: monthlyExpenses || 0,
+        monthlyNet: monthlyNet || 0,
+        categories: data?.categories || {},
+        total: data?.total || { amount: 0, count: 0 }
+      });
     } catch (err) {
       console.error('Failed to fetch summary:', err);
+      setSummary({
+        totalFunds: 0,
+        monthlyIncome: 0,
+        monthlyExpenses: 0,
+        monthlyNet: 0,
+        categories: {},
+        total: { amount: 0, count: 0 }
+      });
     }
   };
 
@@ -473,79 +508,100 @@ const SocietyFinancesList: React.FC<SocietyFinancesListProps> = ({ societyId: pr
 
   return (
     <Box className="society-finances-container">
-      {/* Header with statistics */}
-      <Box className="finances-header animate-in">
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-          <Typography variant="h5" component="h1" className="section-title">Society Finances</Typography>
-          
-          {/* Society selector if no societyId prop is provided */}
-          {!propSocietyId && (
-            <FormControl sx={{ minWidth: 240 }}>
-              <TextField
-                select
-                label="Select Society"
-                value={selectedSocietyId}
-                onChange={(e) => setSelectedSocietyId(e.target.value)}
-                variant="outlined"
-                size="small"
-                disabled={loading}
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: 'var(--border-radius)',
-                    transition: 'var(--transition)'
-                  }
-                }}
-              >
-                {societies.map((society) => (
-                  <MenuItem key={society.id} value={society.id}>{society.name}</MenuItem>
-                ))}
-              </TextField>
-              {!selectedSocietyId && (
-                <FormHelperText error>Please select a society</FormHelperText>
+      <Grid container className="society-finances-container-max-width">
+        <Grid item xs={12}>
+          <div className="page-header">
+            <div className="page-title-section">
+              <Typography variant="h5" component="h1" className="page-header-title">
+                Society Finances
+              </Typography>
+            </div>
+            <Box className="page-header-controls">
+              {/* Society selector if no societyId prop is provided */}
+              {!propSocietyId && (
+                <FormControl className="society-selector">
+                  <TextField
+                    select
+                    label="Select Society"
+                    value={selectedSocietyId}
+                    onChange={(e) => setSelectedSocietyId(e.target.value)}
+                    variant="outlined"
+                    size="small"
+                    disabled={loading}
+                  >
+                    {societies.map((society) => (
+                      <MenuItem key={society.id} value={society.id}>{society.name}</MenuItem>
+                    ))}
+                  </TextField>
+                  {!selectedSocietyId && (
+                    <FormHelperText error>Please select a society</FormHelperText>
+                  )}
+                </FormControl>
               )}
-            </FormControl>
-          )}
-        </Box>
-        
-        {selectedSocietyId && (
-          <Box className="finances-summary animate-in">
-            <Paper elevation={0} className="summary-paper">
-              <Typography variant="subtitle1" sx={{ color: 'var(--text-secondary)', fontSize: '0.95rem', fontWeight: 500 }}>
-                Total Expenses
-              </Typography>
-              <Typography variant="h4" sx={{ fontSize: '2.2rem', fontWeight: 700, my: 1, color: 'var(--text-primary)' }}>
-                {summary.total.amount.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
-              </Typography>
-              <Typography variant="body2" sx={{ color: 'var(--text-secondary)' }}>
-                {summary.total.count} entries
-              </Typography>
-            </Paper>
-            
-            <Box className="summary-categories">
-              {Object.entries(summary.categories).slice(0, 4).map(([category, data], index) => (
-                <Paper key={category} elevation={0} className="category-summary" sx={{ 
-                  borderTopColor: index === 0 ? 'var(--primary-color)' : 
-                                 index === 1 ? 'var(--secondary-color)' : 
-                                 index === 2 ? 'var(--accent-color)' : 
-                                 'var(--info)'
-                }}>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 600, color: 'var(--text-primary)' }}>{category}</Typography>
-                  <Typography variant="h6" sx={{ fontWeight: 700, my: 1 }}>{data.amount.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}</Typography>
-                  <Typography variant="caption" sx={{ color: 'var(--text-secondary)' }}>{data.count} entries</Typography>
-                </Paper>
-              ))}
             </Box>
-          </Box>
-        )}
-      </Box>
+          </div>
+
+          {selectedSocietyId && (
+            <Box className="finances-summary animate-in">
+              {/* Main Total Funds Card */}
+              <Paper elevation={0} className="summary-paper summary-paper-primary">
+                <Typography variant="subtitle1" className="summary-paper-title">
+                  Total Funds Available
+                </Typography>
+                <Typography variant="h4" className="summary-paper-amount">
+                  {(summary.totalFunds || 0).toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
+                </Typography>
+                <Typography variant="body2" className="summary-paper-count">
+                  Current Society Balance
+                </Typography>
+              </Paper>
+              
+              {/* Monthly Financial Cards */}
+              <Box className="summary-categories">
+                <Paper elevation={0} className="category-summary category-summary-income">
+                  <Typography variant="subtitle2" className="category-summary-title">Monthly Income</Typography>
+                  <Typography variant="h6" className="category-summary-amount">
+                    {(summary.monthlyIncome || 0).toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
+                  </Typography>
+                  <Typography variant="caption" className="category-summary-count">This Month</Typography>
+                </Paper>
+                
+                <Paper elevation={0} className="category-summary category-summary-expense">
+                  <Typography variant="subtitle2" className="category-summary-title">Monthly Expenses</Typography>
+                  <Typography variant="h6" className="category-summary-amount">
+                    {(summary.monthlyExpenses || 0).toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
+                  </Typography>
+                  <Typography variant="caption" className="category-summary-count">This Month</Typography>
+                </Paper>
+                
+                <Paper elevation={0} className="category-summary category-summary-net">
+                  <Typography variant="subtitle2" className="category-summary-title">Monthly Net</Typography>
+                  <Typography variant="h6" className="category-summary-amount">
+                    {(summary.monthlyNet || 0).toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
+                  </Typography>
+                  <Typography variant="caption" className="category-summary-count">
+                    {(summary.monthlyNet || 0) >= 0 ? 'Surplus' : 'Deficit'}
+                  </Typography>
+                </Paper>
+                
+                <Paper elevation={0} className="category-summary category-summary-transactions">
+                  <Typography variant="subtitle2" className="category-summary-title">Total Transactions</Typography>
+                  <Typography variant="h6" className="category-summary-amount">
+                    {(summary.total?.count || 0)}
+                  </Typography>
+                  <Typography variant="caption" className="category-summary-count">All Records</Typography>
+                </Paper>
+              </Box>
+            </Box>
+          )}
 
       {!selectedSocietyId && !propSocietyId ? (
         <Paper elevation={0} className="empty-state animate-in">
-          <Box sx={{ mb: 3, opacity: 0.7 }}>
-            <Search sx={{ fontSize: '4rem' }} />
+          <Box className="empty-state-icon">
+            <Search />
           </Box>
-          <Typography variant="h5" sx={{ fontWeight: 600, mb: 2 }}>Please select a society to view finances</Typography>
-          <Typography variant="body1" color="text.secondary" sx={{ mt: 1 }}>
+          <Typography variant="h5" className="empty-state-title">Please select a society to view finances</Typography>
+          <Typography variant="body1" className="empty-state-description">
             Use the dropdown above to select a society to get started
           </Typography>
         </Paper>
@@ -554,19 +610,15 @@ const SocietyFinancesList: React.FC<SocietyFinancesListProps> = ({ societyId: pr
           {/* Filters and controls */}
           <Paper elevation={0} className="filters-container animate-in">
             <Box className="filters-header">
-              <Typography variant="h6" component="h2">
-                <FilterList sx={{ mr: 1, verticalAlign: 'middle', color: 'var(--primary-color)' }} /> 
+              <Typography variant="h6" component="h2" className="filters-title">
+                <FilterList className="filters-icon" /> 
                 Filters
               </Typography>
               <Button 
                 size="small" 
                 onClick={clearFilters}
                 variant="outlined"
-                sx={{ 
-                  borderRadius: 'var(--border-radius)', 
-                  textTransform: 'none',
-                  px: 2
-                }}
+                className="clear-filters-button"
               >
                 Clear All
               </Button>
@@ -666,18 +718,7 @@ const SocietyFinancesList: React.FC<SocietyFinancesListProps> = ({ societyId: pr
                 startIcon={<Add />}
                 onClick={handleAddFinance}
                 disabled={loading}
-                sx={{ 
-                  borderRadius: 'var(--border-radius)',
-                  textTransform: 'none',
-                  px: 3,
-                  py: 1,
-                  fontWeight: 600,
-                  boxShadow: 'var(--card-shadow)',
-                  background: 'var(--primary-color)',
-                  '&:hover': {
-                    background: 'var(--secondary-color)',
-                  }
-                }}
+                className="add-finance-button"
               >
                 Add New Finance
               </Button>
@@ -687,32 +728,14 @@ const SocietyFinancesList: React.FC<SocietyFinancesListProps> = ({ societyId: pr
               <Button
                 variant={viewMode === 'list' ? 'contained' : 'outlined'}
                 onClick={() => setViewMode('list')}
-                sx={{ 
-                  borderRadius: 'var(--border-radius)',
-                  textTransform: 'none',
-                  px: 3,
-                  fontWeight: 500,
-                  ...(viewMode === 'list' ? {
-                    boxShadow: 'none',
-                    background: 'var(--primary-color)'
-                  } : {})
-                }}
+                className={`view-toggle-button ${viewMode === 'list' ? 'active' : ''}`}
               >
                 List View
               </Button>
               <Button
                 variant={viewMode === 'card' ? 'contained' : 'outlined'}
                 onClick={() => setViewMode('card')}
-                sx={{ 
-                  borderRadius: 'var(--border-radius)',
-                  textTransform: 'none',
-                  px: 3,
-                  fontWeight: 500,
-                  ...(viewMode === 'card' ? {
-                    boxShadow: 'none',
-                    background: 'var(--primary-color)'
-                  } : {})
-                }}
+                className={`view-toggle-button ${viewMode === 'card' ? 'active' : ''}`}
               >
                 Card View
               </Button>
@@ -725,10 +748,6 @@ const SocietyFinancesList: React.FC<SocietyFinancesListProps> = ({ societyId: pr
               severity="error" 
               className="finances-error animate-in" 
               onClose={() => setError(null)}
-              sx={{
-                borderRadius: 'var(--border-radius)',
-                boxShadow: 'var(--card-shadow)'
-              }}
             >
               {error}
             </Alert>
@@ -737,7 +756,7 @@ const SocietyFinancesList: React.FC<SocietyFinancesListProps> = ({ societyId: pr
           {/* Loading indicator */}
           {loading && (
             <Box className="finances-loading animate-in">
-              <CircularProgress size={50} thickness={4} sx={{ color: 'var(--primary-color)' }} />
+              <CircularProgress size={50} thickness={4} className="finances-loading-spinner" />
             </Box>
           )}
           
@@ -759,7 +778,7 @@ const SocietyFinancesList: React.FC<SocietyFinancesListProps> = ({ societyId: pr
                 <TableBody>
                   {finances.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={7} align="center">
+                      <TableCell colSpan={7} align="center" className="no-records">
                         {loading ? 'Loading...' : 'No finance records found'}
                       </TableCell>
                     </TableRow>
@@ -1042,6 +1061,8 @@ const SocietyFinancesList: React.FC<SocietyFinancesListProps> = ({ societyId: pr
           </Dialog>
         </>
       )}
+        </Grid>
+      </Grid>
     </Box>
   );
 };

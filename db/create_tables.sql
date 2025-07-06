@@ -26,9 +26,9 @@ CREATE TABLE residents (
     society_id UUID NOT NULL REFERENCES societies(id),
     first_name VARCHAR(100) NOT NULL,
     last_name VARCHAR(100) NOT NULL,
-    email VARCHAR(255) UNIQUE,
+    email VARCHAR(255), -- Removed UNIQUE constraint to allow same person to have multiple units or family members to share
     phone VARCHAR(20),
-    unit_number VARCHAR(50) NOT NULL,
+    unit_number VARCHAR(50) NOT NULL, -- Multiple residents can share the same unit (family members)
     is_owner BOOLEAN DEFAULT FALSE,
     is_committee_member BOOLEAN DEFAULT FALSE,
     committee_role VARCHAR(100),
@@ -81,6 +81,42 @@ CREATE TABLE society_finances (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Add income tracking to society_finances table
+-- Update the expense_type to include income transactions
+ALTER TABLE society_finances 
+DROP CONSTRAINT IF EXISTS society_finances_expense_type_check;
+
+ALTER TABLE society_finances 
+ADD CONSTRAINT society_finances_transaction_type_check 
+CHECK (expense_type IN ('income', 'expense', 'regular', 'adhoc'));
+
+-- Add a new column to better categorize income vs expenses
+ALTER TABLE society_finances 
+ADD COLUMN transaction_category VARCHAR(20) DEFAULT 'expense' 
+CHECK (transaction_category IN ('income', 'expense'));
+
+-- Update existing records to mark them as expenses
+UPDATE society_finances SET transaction_category = 'expense' WHERE transaction_category IS NULL;
+
+-- Add some sample income categories for reference
+-- Common income sources for societies:
+-- - maintenance_fees (monthly maintenance from residents)
+-- - parking_fees
+-- - amenity_fees
+-- - late_fees
+-- - interest_income
+-- - rental_income (from common areas)
+-- - deposits
+-- - other_income
+
+-- Create an index for better performance on the new column
+CREATE INDEX idx_society_finances_transaction_category ON society_finances(transaction_category);
+
+-- Add comments to clarify the schema
+COMMENT ON COLUMN society_finances.transaction_category IS 'Categorizes whether this is an income or expense transaction';
+COMMENT ON COLUMN society_finances.expense_type IS 'For expenses: regular/adhoc. For income: type of income (maintenance_fees, parking_fees, etc.)';
+COMMENT ON COLUMN society_finances.category IS 'Detailed category - for expenses: security, housekeeping, etc. For income: maintenance, parking, amenities, etc.';
 
 -- Create indexes for better performance
 CREATE INDEX idx_residents_society_id ON residents(society_id);

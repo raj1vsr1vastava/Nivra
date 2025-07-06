@@ -5,7 +5,8 @@ import {
   Box, 
   CircularProgress, 
   Alert,
-  Button
+  Button,
+  IconButton
 } from '@mui/material';
 import CardDetails from '../../components/CardDetails';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
@@ -20,6 +21,7 @@ import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import WorkIcon from '@mui/icons-material/Work';
 import ApartmentIcon from '@mui/icons-material/Apartment';
 import Grid from '../../components/shared/Grid';
+import '../../styles/shared-headers.css';
 import './ResidentDetails.css';
 import { ResidentData } from '../../types';
 
@@ -31,13 +33,18 @@ interface Resident extends ResidentData {
   phone?: string;
   unit_number?: string;
   society_id: string | number;
-  society_name?: string;
+  society?: {
+    id: string | number;
+    name: string;
+    city: string;
+    state: string;
+  };
   is_owner: boolean;
   is_committee_member: boolean;
   is_active: boolean;  // Added missing property
   committee_role?: string;
-  joined_date?: string;
-  lease_end_date?: string;
+  move_in_date?: string;
+  move_out_date?: string;
   emergency_contact?: string;
   emergency_phone?: string;
   notes?: string;
@@ -150,22 +157,12 @@ const ResidentDetails: React.FC = () => {
           >
             {error}
           </Alert>
-          <Button 
-            variant="outlined"
-            startIcon={<ArrowBackIcon />} 
+          <IconButton 
             onClick={() => navigate('/residents')}
-            sx={{ 
-              height: '40px',
-              color: 'var(--text-secondary)',
-              '&:hover': {
-                color: 'var(--primary-color)',
-                borderColor: 'var(--primary-color)',
-                background: 'rgba(var(--primary-rgb), 0.05)'
-              }
-            }}
+            className="back-button-header"
           >
-            Back to Residents
-          </Button>
+            <ArrowBackIcon />
+          </IconButton>
         </Container>
       </div>
     );
@@ -186,59 +183,40 @@ const ResidentDetails: React.FC = () => {
           >
             Resident not found
           </Alert>
-          <Button 
-            variant="outlined"
-            startIcon={<ArrowBackIcon />} 
+          <IconButton 
             onClick={() => navigate('/residents')}
-            sx={{ 
-              height: '40px',
-              color: 'var(--text-secondary)',
-              '&:hover': {
-                color: 'var(--primary-color)',
-                borderColor: 'var(--primary-color)',
-                background: 'rgba(var(--primary-rgb), 0.05)'
-              }
-            }}
+            className="back-button-header"
           >
-            Back to Residents
-          </Button>
+            <ArrowBackIcon />
+          </IconButton>
         </Container>
       </div>
     );
   }
 
-  const joinedDate = resident.joined_date 
-    ? new Date(resident.joined_date).toLocaleDateString() 
+  const joinedDate = resident.move_in_date 
+    ? new Date(resident.move_in_date).toLocaleDateString() 
     : 'Not Available';
 
-  const leaseEndDate = resident.lease_end_date
-    ? new Date(resident.lease_end_date).toLocaleDateString()
+  const leaseEndDate = resident.move_out_date
+    ? new Date(resident.move_out_date).toLocaleDateString()
     : 'Not Available';
 
   return (
     <div className="resident-details-container">
       <Container maxWidth="xl" sx={{ px: 0 }}>
-        <div className="resident-header">
-          <Button 
-            variant="outlined"
-            startIcon={<ArrowBackIcon />} 
-            onClick={() => navigate('/residents')}
-            sx={{ 
-              mr: 2,
-              height: '40px',
-              color: 'var(--text-secondary)',
-              '&:hover': {
-                color: 'var(--primary-color)',
-                borderColor: 'var(--primary-color)',
-                background: 'rgba(var(--primary-rgb), 0.05)'
-              }
-            }}
-          >
-            Back
-          </Button>
-          <h1 className="resident-header-title">
-            {resident.name}
-          </h1>
+        <div className="page-header">
+          <div className="page-title-section">
+            <IconButton 
+              onClick={() => navigate('/residents')}
+              className="page-back-button"
+            >
+              <ArrowBackIcon />
+            </IconButton>
+            <h1 className="page-header-title">
+              {resident.name}
+            </h1>
+          </div>
           <Button 
             variant="contained"
             color="primary" 
@@ -297,7 +275,7 @@ const ResidentDetails: React.FC = () => {
             {
               icon: <ApartmentIcon />,
               label: "Society",
-              value: resident.society_name || 'Unknown',
+              value: resident.society?.name || 'Unknown',
               iconColor: 'var(--info)'
             },
             {
@@ -306,7 +284,7 @@ const ResidentDetails: React.FC = () => {
               value: joinedDate,
               iconColor: 'var(--info)'
             },
-            ...(resident.lease_end_date && !resident.is_owner ? [{
+            ...(resident.move_out_date && !resident.is_owner ? [{
               icon: <CalendarMonthIcon />,
               label: "Lease End Date",
               value: leaseEndDate,

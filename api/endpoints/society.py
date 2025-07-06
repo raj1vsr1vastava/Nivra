@@ -18,15 +18,37 @@ def get_societies(
     skip: int = 0, 
     limit: int = 100, 
     name: Optional[str] = None,
+    order_by: Optional[str] = Query("name", description="Field to order by (name, created_at, updated_at)"),
+    order_desc: bool = Query(False, description="Order in descending order"),
     db: Session = Depends(get_db)
 ):
     """
-    Get all societies or filter by name.
+    Get all societies or filter by name, with optional sorting.
     """
     query = db.query(models.Society)
     
     if name:
         query = query.filter(models.Society.name.ilike(f"%{name}%"))
+    
+    # Add ordering
+    if order_by == "name":
+        if order_desc:
+            query = query.order_by(models.Society.name.desc())
+        else:
+            query = query.order_by(models.Society.name.asc())
+    elif order_by == "created_at":
+        if order_desc:
+            query = query.order_by(models.Society.created_at.desc())
+        else:
+            query = query.order_by(models.Society.created_at.asc())
+    elif order_by == "updated_at":
+        if order_desc:
+            query = query.order_by(models.Society.updated_at.desc())
+        else:
+            query = query.order_by(models.Society.updated_at.asc())
+    else:
+        # Default to name ascending
+        query = query.order_by(models.Society.name.asc())
     
     societies = query.offset(skip).limit(limit).all()
     return societies
@@ -106,9 +128,37 @@ def get_society_residents(
     if society is None:
         raise HTTPException(status_code=404, detail="Society not found")
     
-    # Get residents for the society
+    # Get residents for the society, ordered by unit_number alphabetically
     residents = db.query(models.Resident).filter(
         models.Resident.society_id == society_id
+    ).order_by(
+        models.Resident.unit_number.asc().nulls_last(),
+        models.Resident.last_name.asc(),
+        models.Resident.first_name.asc()
     ).offset(skip).limit(limit).all()
     
     return residents
+
+
+@router.get("/societies/{society_id}/committee", response_model=List[schemas.Resident])
+def get_society_committee_members(
+    society_id: UUID, 
+    skip: int = 0, 
+    limit: int = 100,
+    db: Session = Depends(get_db)
+):
+    """
+    Get all committee members belonging to a specific society.
+    """
+    # Check if society exists
+    society = db.query(models.Society).filter(models.Society.id == society_id).first()
+    if society is None:
+        raise HTTPException(status_code=404, detail="Society not found")
+    
+    # Get committee members for the society
+    committee_members = db.query(models.Resident).filter(
+        models.Resident.society_id == society_id,
+        models.Resident.is_committee_member == True
+    ).order_by(models.Resident.committee_role.asc()).offset(skip).limit(limit).all()
+    
+    return committee_members

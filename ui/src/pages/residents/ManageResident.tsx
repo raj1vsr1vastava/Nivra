@@ -15,12 +15,14 @@ import {
   Select
 } from '@mui/material';
 import Grid from '../../components/shared/Grid';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import residentService from '../../services/residents/residentService';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { societyService } from '../../services';
 import SaveIcon from '@mui/icons-material/Save';
+import '../../styles/shared-headers.css';
+import './ManageResident.css';
 import './ResidentDetails.css'; // Reuse the same styles
-import { ResidentData } from '../../types';
+import { ResidentData, SocietyData } from '../../types';
 
 // Extend the Resident interface with additional details
 interface Resident extends ResidentData {
@@ -30,13 +32,18 @@ interface Resident extends ResidentData {
   phone?: string;
   unit_number?: string;
   society_id: string | number;
-  society_name?: string;
+  society?: {
+    id: string | number;
+    name: string;
+    city: string;
+    state: string;
+  };
   is_owner: boolean;
   is_committee_member: boolean;
   is_active: boolean;
   committee_role?: string;
-  joined_date?: string;
-  lease_end_date?: string;
+  move_in_date?: string;
+  move_out_date?: string;
   emergency_contact?: string;
   emergency_phone?: string;
   notes?: string;
@@ -53,8 +60,8 @@ interface FieldErrors {
   is_owner?: string;
   is_committee_member?: string;
   committee_role?: string;
-  joined_date?: string;
-  lease_end_date?: string;
+  move_in_date?: string;
+  move_out_date?: string;
   emergency_contact?: string;
   emergency_phone?: string;
   notes?: string;
@@ -63,23 +70,70 @@ interface FieldErrors {
 // Use type for React Router v6
 type RouteParams = {
   residentId?: string;
+  societyId?: string;
 };
 
-const ResidentEdit: React.FC = () => {
+const ManageResident: React.FC = () => {
   const params = useParams<RouteParams>();
+  const [searchParams] = useSearchParams();
   const residentId = params.residentId;
+  const societyId = params.societyId || searchParams.get('societyId');
   const navigate = useNavigate();
   const [resident, setResident] = useState<Resident | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
+  const [societies, setSocieties] = useState<SocietyData[]>([]);
+
+  // Determine if this is Add mode (no residentId) or Edit mode
+  const isAddMode = !residentId;
 
   useEffect(() => {
     if (residentId) {
       fetchResidentDetails();
+    } else {
+      // Add mode - initialize with empty resident
+      initializeNewResident();
     }
+    // Always fetch societies for the dropdown in add mode
+    fetchSocieties();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [residentId]);
+
+  const initializeNewResident = (): void => {
+    const newResident: Resident = {
+      id: '',
+      first_name: '',
+      last_name: '',
+      name: '',
+      email: '',
+      phone: '',
+      unit_number: '',
+      society_id: societyId || '',
+      is_owner: true,
+      is_committee_member: false,
+      committee_role: '',
+      is_active: true,
+      move_in_date: '',
+      move_out_date: '',
+      emergency_contact: '',
+      emergency_phone: '',
+      notes: ''
+    };
+    
+    setResident(newResident);
+    setLoading(false);
+  };
+
+  const fetchSocieties = async (): Promise<void> => {
+    try {
+      const societiesData = await societyService.getAllSocieties();
+      setSocieties(societiesData);
+    } catch (err) {
+      console.error('Error fetching societies:', err);
+      // Don't set error state, just log it
+    }
+  };
 
   const fetchResidentDetails = async (): Promise<void> => {
     if (!residentId) return;
@@ -179,23 +233,23 @@ const ResidentEdit: React.FC = () => {
     }
     
     // Date validations
-    if (resident?.joined_date) {
-      const joinedDate = new Date(resident.joined_date);
-      if (isNaN(joinedDate.getTime())) {
-        newErrors.joined_date = 'Invalid date format';
+    if (resident?.move_in_date) {
+      const moveInDate = new Date(resident.move_in_date);
+      if (isNaN(moveInDate.getTime())) {
+        newErrors.move_in_date = 'Invalid date format';
         isValid = false;
       }
     }
     
-    if (resident?.lease_end_date) {
-      const leaseEndDate = new Date(resident.lease_end_date);
-      if (isNaN(leaseEndDate.getTime())) {
-        newErrors.lease_end_date = 'Invalid date format';
+    if (resident?.move_out_date) {
+      const moveOutDate = new Date(resident.move_out_date);
+      if (isNaN(moveOutDate.getTime())) {
+        newErrors.move_out_date = 'Invalid date format';
         isValid = false;
-      } else if (resident.joined_date) {
-        const joinedDate = new Date(resident.joined_date);
-        if (leaseEndDate < joinedDate) {
-          newErrors.lease_end_date = 'Lease end date cannot be earlier than joined date';
+      } else if (resident.move_in_date) {
+        const moveInDate = new Date(resident.move_in_date);
+        if (moveOutDate < moveInDate) {
+          newErrors.move_out_date = 'Move out date cannot be earlier than move in date';
           isValid = false;
         }
       }
@@ -220,6 +274,7 @@ const ResidentEdit: React.FC = () => {
       const residentData: Partial<ResidentData> = {
         first_name: resident.first_name,
         last_name: resident.last_name,
+        name: `${resident.first_name} ${resident.last_name}`.trim(),
         email: resident.email,
         phone: resident.phone,
         unit_number: resident.unit_number,
@@ -229,19 +284,32 @@ const ResidentEdit: React.FC = () => {
         committee_role: resident.committee_role,
         is_active: resident.is_active,
         // Ensure dates are properly formatted YYYY-MM-DD
-        joined_date: resident.joined_date ? resident.joined_date.substring(0, 10) : undefined,
-        lease_end_date: resident.lease_end_date ? resident.lease_end_date.substring(0, 10) : undefined,
+        move_in_date: resident.move_in_date ? resident.move_in_date.substring(0, 10) : undefined,
+        move_out_date: resident.move_out_date ? resident.move_out_date.substring(0, 10) : undefined,
         emergency_contact: resident.emergency_contact,
         emergency_phone: resident.emergency_phone,
         notes: resident.notes
       };
       
-      // Submit to API
-      console.log('Submitting resident update with payload:', residentData);
-      console.log('Resident ID for update:', residentId);
-      try {
-        const updatedResident = await residentService.updateResident(residentId!, residentData);
-        console.log('Resident update successful, response:', updatedResident);
+      // Submit to API - different endpoints for Add vs Edit
+      console.log(`Submitting resident ${isAddMode ? 'creation' : 'update'} with payload:`, residentData);
+      
+      let result: any;
+      if (isAddMode) {
+        result = await residentService.createResident(residentData as any);
+        console.log('Resident creation successful, response:', result);
+        
+        // Navigate to the new resident's details page
+        navigate(`/residents/${result.id}`, { 
+          state: { 
+            created: true, 
+            timestamp: new Date().getTime() 
+          }
+        });
+      } else {
+        console.log('Resident ID for update:', residentId);
+        result = await residentService.updateResident(residentId!, residentData as any);
+        console.log('Resident update successful, response:', result);
         
         // Navigate back to details immediately on successful save with a state param to force refresh
         navigate(`/residents/${residentId}`, { 
@@ -250,13 +318,10 @@ const ResidentEdit: React.FC = () => {
             timestamp: new Date().getTime() 
           }
         });
-      } catch (updateErr) {
-        console.error('Specific update error:', updateErr);
-        throw updateErr;
       }
       
     } catch (err: any) {
-      console.error('Error updating resident:', err);
+      console.error(`Error ${isAddMode ? 'creating' : 'updating'} resident:`, err);
       
       // Handle validation errors from backend
       if (err.errors && typeof err.errors === 'object') {
@@ -275,16 +340,16 @@ const ResidentEdit: React.FC = () => {
         });
       }
       
-      setError(err.message || 'Failed to update resident. Please verify all required fields are filled correctly.');
+      setError(err.message || `Failed to ${isAddMode ? 'create' : 'update'} resident. Please verify all required fields are filled correctly.`);
     }
   };
 
   if (loading) {
     return (
-      <div className="resident-details-container">
-        <Container maxWidth="xl" sx={{ px: 0 }}>
-          <Box sx={{ display: 'flex', justifyContent: 'center', my: 5 }}>
-            <CircularProgress size={40} sx={{ color: 'var(--primary-color)' }} />
+      <div className="manage-resident-container">
+        <Container maxWidth="xl" className="manage-resident-container-max-width">
+          <Box className="manage-resident-loading-container">
+            <CircularProgress size={40} className="manage-resident-loading-spinner" />
           </Box>
         </Container>
       </div>
@@ -293,35 +358,14 @@ const ResidentEdit: React.FC = () => {
 
   if (error && !resident) {
     return (
-      <div className="resident-details-container">
-        <Container maxWidth="xl" sx={{ px: 0 }}>
+      <div className="manage-resident-container">
+        <Container maxWidth="xl" className="manage-resident-container-max-width">
           <Alert 
             severity="error" 
-            sx={{ 
-              mt: 3, 
-              mb: 3,
-              borderRadius: 'var(--border-radius)',
-              fontWeight: 500
-            }}
+            className="manage-resident-error-alert"
           >
             {error}
           </Alert>
-          <Button 
-            variant="outlined"
-            startIcon={<ArrowBackIcon />} 
-            onClick={() => navigate(`/residents/${residentId}`)}
-            sx={{ 
-              height: '40px',
-              color: 'var(--text-secondary)',
-              '&:hover': {
-                color: 'var(--primary-color)',
-                borderColor: 'var(--primary-color)',
-                background: 'rgba(var(--primary-rgb), 0.05)'
-              }
-            }}
-          >
-            Back to Resident Details
-          </Button>
         </Container>
       </div>
     );
@@ -329,84 +373,43 @@ const ResidentEdit: React.FC = () => {
 
   if (!resident) {
     return (
-      <div className="resident-details-container">
-        <Container maxWidth="xl" sx={{ px: 0 }}>
+      <div className="manage-resident-container">
+        <Container maxWidth="xl" className="manage-resident-container-max-width">
           <Alert 
             severity="warning" 
-            sx={{ 
-              mt: 3, 
-              mb: 3,
-              borderRadius: 'var(--border-radius)',
-              fontWeight: 500
-            }}
+            className="manage-resident-warning-alert"
           >
             Resident not found
           </Alert>
-          <Button 
-            variant="outlined"
-            startIcon={<ArrowBackIcon />} 
-            onClick={() => navigate('/residents')}
-            sx={{ 
-              height: '40px',
-              color: 'var(--text-secondary)',
-              '&:hover': {
-                color: 'var(--primary-color)',
-                borderColor: 'var(--primary-color)',
-                background: 'rgba(var(--primary-rgb), 0.05)'
-              }
-            }}
-          >
-            Back to Residents
-          </Button>
         </Container>
       </div>
     );
   }
 
   return (
-    <div className="resident-details-container">
-      <Container maxWidth="xl" sx={{ px: 0 }}>
-        <div className="resident-header">
-          <Button 
-            variant="outlined"
-            startIcon={<ArrowBackIcon />} 
-            onClick={() => navigate(`/residents/${residentId}`)}
-            sx={{ 
-              mr: 2,
-              height: '40px',
-              color: 'var(--text-secondary)',
-              '&:hover': {
-                color: 'var(--primary-color)',
-                borderColor: 'var(--primary-color)',
-                background: 'rgba(var(--primary-rgb), 0.05)'
-              }
-            }}
-          >
-            Back
-          </Button>
-          <h1 className="resident-header-title">
-            Edit Resident: {resident.first_name} {resident.last_name}
+    <div className="manage-resident-container">
+      <Container maxWidth="xl" className="manage-resident-container-max-width">
+        <div className="page-header">
+          <h1 className="page-header-title">
+            {isAddMode 
+              ? 'Add New Resident' 
+              : `${resident.first_name} ${resident.last_name}`
+            }
           </h1>
         </div>
         
         {error && (
           <Alert 
             severity="error" 
-            sx={{ mb: 3, borderRadius: 'var(--border-radius)' }}
+            className="manage-resident-form-error-alert"
           >
             {error}
           </Alert>
         )}
 
-        <Box component="form" onSubmit={handleSubmit} sx={{ mb: 4 }}>
-          <Box sx={{ 
-            backgroundColor: 'white', 
-            padding: 3, 
-            borderRadius: 'var(--border-radius)', 
-            boxShadow: 'var(--shadow-sm)',
-            mb: 3
-          }}>
-            <Typography variant="h6" sx={{ mb: 2, fontWeight: 600, color: 'var(--text-primary)' }}>
+        <Box component="form" onSubmit={handleSubmit} className="manage-resident-form">
+          <Box className="manage-resident-section">
+            <Typography variant="h6" className="manage-resident-section-title">
               Basic Information
             </Typography>
             
@@ -482,14 +485,8 @@ const ResidentEdit: React.FC = () => {
             </Grid>
           </Box>
           
-          <Box sx={{ 
-            backgroundColor: 'white', 
-            padding: 3, 
-            borderRadius: 'var(--border-radius)', 
-            boxShadow: 'var(--shadow-sm)',
-            mb: 3
-          }}>
-            <Typography variant="h6" sx={{ mb: 2, fontWeight: 600, color: 'var(--text-primary)' }}>
+          <Box className="manage-resident-section">
+            <Typography variant="h6" className="manage-resident-section-title">
               Residence Information
             </Typography>
             
@@ -508,18 +505,43 @@ const ResidentEdit: React.FC = () => {
               </Grid>
               
               <Grid item xs={12} md={6}>
-                <TextField
-                  required
-                  fullWidth
-                  disabled
-                  id="society_id"
-                  name="society_id"
-                  label="Society ID"
-                  value={resident.society_id || ''}
-                  onChange={handleChange}
-                  error={!!fieldErrors.society_id}
-                  helperText={fieldErrors.society_id || 'Society ID cannot be changed'}
-                />
+                {isAddMode ? (
+                  <FormControl fullWidth error={!!fieldErrors.society_id}>
+                    <InputLabel id="society-select-label">Society</InputLabel>
+                    <Select
+                      labelId="society-select-label"
+                      id="society_id"
+                      name="society_id"
+                      value={resident.society_id.toString()}
+                      label="Society"
+                      onChange={(e) => handleChange(e as React.ChangeEvent<HTMLInputElement>)}
+                    >
+                      {societies.map((society) => (
+                        <MenuItem key={society.id} value={society.id.toString()}>
+                          {society.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                    {fieldErrors.society_id && (
+                      <Typography variant="caption" color="error" className="manage-resident-field-error">
+                        {fieldErrors.society_id}
+                      </Typography>
+                    )}
+                  </FormControl>
+                ) : (
+                  <TextField
+                    required
+                    fullWidth
+                    disabled
+                    id="society_id"
+                    name="society_id"
+                    label="Society ID"
+                    value={resident.society_id || ''}
+                    onChange={handleChange}
+                    error={!!fieldErrors.society_id}
+                    helperText={fieldErrors.society_id || 'Society ID cannot be changed'}
+                  />
+                )}
               </Grid>
               
               <Grid item xs={12} md={6}>
@@ -539,15 +561,15 @@ const ResidentEdit: React.FC = () => {
               <Grid item xs={12} md={6}>
                 <TextField
                   fullWidth
-                  id="joined_date"
-                  name="joined_date"
+                  id="move_in_date"
+                  name="move_in_date"
                   label={resident.is_owner ? "Joined Date" : "Move-in Date"}
                   type="date"
                   InputLabelProps={{ shrink: true }}
-                  value={resident.joined_date ? resident.joined_date.substring(0, 10) : ''}
+                  value={resident.move_in_date ? resident.move_in_date.substring(0, 10) : ''}
                   onChange={handleChange}
-                  error={!!fieldErrors.joined_date}
-                  helperText={fieldErrors.joined_date}
+                  error={!!fieldErrors.move_in_date}
+                  helperText={fieldErrors.move_in_date}
                 />
               </Grid>
               
@@ -555,29 +577,23 @@ const ResidentEdit: React.FC = () => {
                 <Grid item xs={12} md={6}>
                   <TextField
                     fullWidth
-                    id="lease_end_date"
-                    name="lease_end_date"
+                    id="move_out_date"
+                    name="move_out_date"
                     label="Lease End Date"
                     type="date"
                     InputLabelProps={{ shrink: true }}
-                    value={resident.lease_end_date ? resident.lease_end_date.substring(0, 10) : ''}
+                    value={resident.move_out_date ? resident.move_out_date.substring(0, 10) : ''}
                     onChange={handleChange}
-                    error={!!fieldErrors.lease_end_date}
-                    helperText={fieldErrors.lease_end_date}
+                    error={!!fieldErrors.move_out_date}
+                    helperText={fieldErrors.move_out_date}
                   />
                 </Grid>
               )}
             </Grid>
           </Box>
           
-          <Box sx={{ 
-            backgroundColor: 'white', 
-            padding: 3, 
-            borderRadius: 'var(--border-radius)', 
-            boxShadow: 'var(--shadow-sm)',
-            mb: 3
-          }}>
-            <Typography variant="h6" sx={{ mb: 2, fontWeight: 600, color: 'var(--text-primary)' }}>
+          <Box className="manage-resident-section">
+            <Typography variant="h6" className="manage-resident-section-title">
               Committee Information
             </Typography>
             
@@ -615,7 +631,7 @@ const ResidentEdit: React.FC = () => {
                       <MenuItem value="Other">Other</MenuItem>
                     </Select>
                     {fieldErrors.committee_role && (
-                      <Typography variant="caption" color="error">
+                      <Typography variant="caption" color="error" className="manage-resident-field-error">
                         {fieldErrors.committee_role}
                       </Typography>
                     )}
@@ -625,14 +641,8 @@ const ResidentEdit: React.FC = () => {
             </Grid>
           </Box>
           
-          <Box sx={{ 
-            backgroundColor: 'white', 
-            padding: 3, 
-            borderRadius: 'var(--border-radius)', 
-            boxShadow: 'var(--shadow-sm)',
-            mb: 3
-          }}>
-            <Typography variant="h6" sx={{ mb: 2, fontWeight: 600, color: 'var(--text-primary)' }}>
+          <Box className="manage-resident-section">
+            <Typography variant="h6" className="manage-resident-section-title">
               Emergency Contact Information
             </Typography>
             
@@ -665,14 +675,8 @@ const ResidentEdit: React.FC = () => {
             </Grid>
           </Box>
           
-          <Box sx={{ 
-            backgroundColor: 'white', 
-            padding: 3, 
-            borderRadius: 'var(--border-radius)', 
-            boxShadow: 'var(--shadow-sm)',
-            mb: 3
-          }}>
-            <Typography variant="h6" sx={{ mb: 2, fontWeight: 600, color: 'var(--text-primary)' }}>
+          <Box className="manage-resident-section">
+            <Typography variant="h6" className="manage-resident-section-title">
               Additional Notes
             </Typography>
             
@@ -694,18 +698,11 @@ const ResidentEdit: React.FC = () => {
             </Grid>
           </Box>
           
-          <Box sx={{ display: 'flex', gap: 2, mt: 3 }}>
+          <Box className="manage-resident-form-actions">
             <Button
               variant="outlined"
-              onClick={() => navigate(`/residents/${residentId}`)}
-              sx={{ 
-                height: '40px',
-                color: 'var(--text-secondary)',
-                '&:hover': {
-                  color: 'var(--primary-color)',
-                  borderColor: 'var(--primary-color)'
-                }
-              }}
+              onClick={() => navigate(isAddMode ? '/residents' : `/residents/${residentId}`)}
+              className="manage-resident-button manage-resident-button-cancel"
             >
               Cancel
             </Button>
@@ -714,11 +711,9 @@ const ResidentEdit: React.FC = () => {
               variant="contained"
               color="primary"
               startIcon={<SaveIcon />}
-              sx={{ 
-                height: '40px'
-              }}
+              className="manage-resident-button"
             >
-              Save Changes
+              {isAddMode ? 'Create Resident' : 'Save Changes'}
             </Button>
           </Box>
         </Box>
@@ -727,4 +722,4 @@ const ResidentEdit: React.FC = () => {
   );
 };
 
-export default ResidentEdit;
+export default ManageResident;

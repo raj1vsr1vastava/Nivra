@@ -32,6 +32,7 @@ export interface ActionData {
 export interface CardProps {
   data?: any;
   title: string;
+  subtitle?: string;
   fields?: CardField[];
   chips?: ChipData[];
   actions?: ActionData[];
@@ -64,7 +65,7 @@ export interface SocietyData {
 
 export interface ResidentData {
   id: string | number;
-  name: string;
+  name?: string;
   first_name: string;
   last_name: string;
   unit?: string | number;
@@ -73,13 +74,18 @@ export interface ResidentData {
   email?: string;
   phone?: string;
   society_id: string | number;
-  society_name?: string;
+  society?: {
+    id: string | number;
+    name: string;
+    city: string;
+    state: string;
+  };
   is_owner: boolean;
   is_committee_member: boolean;
   is_active: boolean;
   committee_role?: string;
-  joined_date?: string;
-  lease_end_date?: string;
+  move_in_date?: string;
+  move_out_date?: string;
   emergency_contact?: string;
   emergency_phone?: string;
   notes?: string;
@@ -87,12 +93,56 @@ export interface ResidentData {
 
 export interface FinanceData {
   id: string | number;
-  title: string;
+  resident_id: string | number;
   amount: number;
-  date: string | Date;
+  currency: string;
+  payment_status: 'paid' | 'pending' | 'overdue' | 'partial';
+  transaction_type: 'maintenance' | 'utility' | 'parking' | 'special_charge' | 'late_fee' | 'security_deposit';
+  description?: string;
+  invoice_number?: string;
+  receipt_number?: string;
+  due_date?: string;
+  payment_date?: string;
+  created_at?: string;
+  updated_at?: string;
+  title?: string;
+  date?: string | Date;
   category?: string;
-  type: 'income' | 'expense';
+  type?: 'income' | 'expense';
   // Add other finance properties as needed
+}
+
+// Finance-related interfaces for ResidentFinancesList
+export interface FinanceRecord {
+  id: string | number;
+  resident_id: string | number;
+  amount: number;
+  currency: string;
+  payment_status: 'paid' | 'pending' | 'overdue' | 'partial';
+  transaction_type: 'maintenance' | 'utility' | 'parking' | 'special_charge' | 'late_fee' | 'security_deposit';
+  description?: string;
+  invoice_number?: string;
+  receipt_number?: string;
+  due_date?: string;
+  payment_date?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface FinanceSummary {
+  totalAmount: number;
+  paidAmount: number;
+  pendingAmount: number;
+  overdueAmount: number;
+}
+
+export interface FilterOption {
+  value: string;
+  label: string;
+}
+
+export interface StatusColorMap {
+  [key: string]: 'success' | 'warning' | 'error' | 'info' | 'default';
 }
 
 export interface UserData {
@@ -116,3 +166,11 @@ export interface PermissionData {
   description: string;
   // Add other permission properties as needed
 }
+
+export interface SelectOption {
+  value: string;
+  label: string;
+}
+
+export type PaymentStatus = 'paid' | 'pending' | 'overdue' | 'partial';
+export type TransactionType = 'maintenance' | 'utility' | 'parking' | 'special_charge' | 'late_fee' | 'security_deposit';

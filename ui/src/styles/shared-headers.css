@@ -1,0 +1,158 @@
+/* Global Header Styles for List Pages */
+@import 'theme.css';
+
+/* Base header container styles */
+.page-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24px;
+  position: relative;
+  padding: 0 8px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+@media (min-width: 768px) {
+  .page-header {
+    flex-wrap: nowrap;
+    justify-content: space-between;
+  }
+}
+
+/* Header title styles */
+.page-header-title {
+  flex-grow: 1;
+  margin: 0 0 2px 0;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  position: relative;
+  padding-bottom: 4px;
+  min-width: 0; /* Allow text to shrink if needed */
+}
+
+/* Title section - contains back button and title */
+.page-title-section {
+  display: flex;
+  align-items: center;
+  flex-grow: 1;
+  min-width: 0; /* Allow text to shrink if needed */
+  order: 1; /* First on mobile */
+}
+
+@media (min-width: 768px) {
+  .page-title-section {
+    order: 0; /* First on desktop */
+  }
+}
+
+/* Header controls container */
+.page-header-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  width: 100%;
+  order: 2; /* Second on both mobile and desktop */
+}
+
+@media (min-width: 768px) {
+  .page-header-controls {
+    gap: 16px;
+    flex-wrap: nowrap;
+    width: auto;
+    order: 2; /* Keep consistent order */
+  }
+}
+
+/* Search container */
+.page-search-container {
+  display: flex;
+  flex-grow: 1;
+  max-width: 100%;
+  min-width: 100%;
+}
+
+@media (min-width: 768px) {
+  .page-search-container {
+    max-width: 300px;
+    min-width: 200px;
+    flex-grow: 0;
+  }
+}
+
+/* Filter container */
+.page-filter-container {
+  display: flex;
+  flex-grow: 1;
+  max-width: 100%;
+  min-width: 100%;
+}
+
+@media (min-width: 768px) {
+  .page-filter-container {
+    max-width: 250px;
+    min-width: 200px;
+    flex-grow: 0;
+  }
+}
+
+/* Add button */
+.page-add-button {
+  width: 100%;
+  height: 40px;
+}
+
+@media (min-width: 768px) {
+  .page-add-button {
+    width: auto;
+    margin-left: 8px;
+  }
+}
+
+/* Back button */
+.page-back-button {
+  margin-right: 16px;
+  color: var(--text-secondary);
+}
+
+.page-back-button:hover {
+  color: var(--primary-color);
+  background-color: rgba(var(--primary-rgb), 0.05);
+}
+
+/* Alternative header layout for societies (column on mobile) */
+.page-header-column {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: flex-start;
+  margin-bottom: 24px;
+  position: relative;
+  padding: 0 8px;
+}
+
+@media (min-width: 768px) {
+  .page-header-column {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+}
+
+/* Column layout title */
+.page-header-column .page-header-title {
+  margin: 4px 0;
+  flex-grow: 0; /* Don't grow in column layout */
+}
+
+/* Column layout controls */
+.page-header-column .page-header-controls {
+  order: 0; /* No special ordering needed */
+}
+
+@media (min-width: 768px) {
+  .page-header-column .page-header-controls {
+    order: 0;
+  }
+}

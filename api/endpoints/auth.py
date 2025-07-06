@@ -46,14 +46,17 @@ def get_password_hash(password):
     return pwd_context.hash(password)
 
 
-def get_user_by_username(db: Session, username: str):
-    """Get user by username."""
-    return db.query(models.User).filter(models.User.username == username).first()
+def get_user_by_username_or_email(db: Session, username_or_email: str):
+    """Get user by username or email."""
+    user = db.query(models.User).filter(models.User.username == username_or_email).first()
+    if not user:
+        user = db.query(models.User).filter(models.User.email == username_or_email).first()
+    return user
 
 
-def authenticate_user(db: Session, username: str, password: str):
-    """Authenticate user."""
-    user = get_user_by_username(db, username)
+def authenticate_user(db: Session, username_or_email: str, password: str):
+    """Authenticate user by username or email."""
+    user = get_user_by_username_or_email(db, username_or_email)
     if not user or not verify_password(password, user.password_hash):
         return None
     return user
@@ -90,7 +93,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = De
     if not token_data.username:
         raise credentials_exception
         
-    user = get_user_by_username(db, username=token_data.username)
+    user = get_user_by_username_or_email(db, token_data.username)
     if user is None:
         raise credentials_exception
     return user
@@ -209,3 +212,103 @@ def has_permission(
     ).first() is not None
     
     return has_specific_permission
+
+
+@router.post("/auth/signup", response_model=schemas.User, status_code=201)
+async def signup(
+    user_data: schemas.SignupRequest,
+    db: Session = Depends(get_db)
+):
+    """
+    Create a new user account (signup).
+    """
+    # Check if username already exists
+    db_username = db.query(models.User).filter(models.User.username == user_data.username).first()
+    if db_username:
+        raise HTTPException(
+            status_code=400, 
+            detail="Username already registered"
+        )
+    
+    # Check if email already exists
+    db_email = db.query(models.User).filter(models.User.email == user_data.email).first()
+    if db_email:
+        raise HTTPException(
+            status_code=400, 
+            detail="Email already registered"
+        )
+    
+    # Get default role (resident) for new signups
+    default_role = db.query(models.Role).filter(models.Role.name == "resident").first()
+    if not default_role:
+        raise HTTPException(
+            status_code=500, 
+            detail="Default role not found"
+        )
+    
+    # Create user
+    hashed_password = get_password_hash(user_data.password)
+    db_user = models.User(
+        username=user_data.username,
+        email=user_data.email,
+        full_name=user_data.full_name,
+        password_hash=hashed_password,
+        role_id=default_role.id,
+        resident_id=None  # Will be set later when user joins a society
+    )
+    
+    db.add(db_user)
+    db.commit()
+    db.refresh(db_user)
+    
+    return db_user
+
+
+@router.post("/auth/login", response_model=dict)
+async def login(
+    login_data: schemas.LoginRequest,
+    db: Session = Depends(get_db)
+):
+    """
+    Login endpoint for web app (alternative to OAuth2 token).
+    """
+    user = authenticate_user(db, login_data.username, login_data.password)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password"
+        )
+    
+    # Update last login time
+    setattr(user, "last_login", datetime.utcnow())
+    db.commit()
+    
+    # Get role information
+    role = db.query(models.Role).filter(models.Role.id == user.role_id).first()
+    
+    # Create access token
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        data={"sub": user.username}, expires_delta=access_token_expires
+    )
+    
+    # Split full_name into first and last names
+    name_parts = user.full_name.split(' ', 1)
+    first_name = name_parts[0] if name_parts else user.full_name
+    last_name = name_parts[1] if len(name_parts) > 1 else ""
+    
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "user": {
+            "id": str(user.id),
+            "username": user.username,
+            "email": user.email,
+            "firstName": first_name,
+            "lastName": last_name,
+            "role": role.name if role else "resident",
+            "userStatus": "active" if getattr(user, 'is_active', False) else "inactive",
+            "societyId": str(user.resident.society_id) if user.resident else None,
+            "avatar": None
+        }
+    }

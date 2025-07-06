@@ -8,24 +8,6 @@
   box-sizing: border-box;
 }
 
-.society-header {
-  display: flex;
-  align-items: center;
-  margin-bottom: 24px; /* Match SocietiesList margin */
-  position: relative;
-  padding: 0 8px; /* Match SocietiesList padding */
-}
-
-.society-header-title {
-  flex-grow: 1;
-  margin: 0 0 2px 0;
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: var(--text-primary);
-  position: relative;
-  padding-bottom: 4px;
-}
-
 .society-info-card {
   padding: 24px;
   margin-bottom: 32px;
@@ -73,4 +55,651 @@
 
 .negative-balance {
   color: #f44336; /* error.main */
+}
+
+/* Society Detail Cards */
+.society-detail-card {
+  padding: 24px;
+  height: 180px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  background-color: var(--color-card);
+  border-radius: var(--border-radius);
+  border: 1px solid var(--color-border-light);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-normal);
+}
+
+.society-detail-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.society-detail-card.address-card:hover {
+  border-color: var(--primary-color);
+}
+
+.society-detail-card.contact-card:hover {
+  border-color: var(--secondary-color);
+}
+
+.society-detail-card.units-card:hover {
+  border-color: var(--info);
+}
+
+.society-detail-card.date-card:hover {
+  border-color: var(--accent-color);
+}
+
+.society-detail-card.registration-card:hover {
+  border-color: var(--warning);
+}
+
+.society-detail-card.committee-card:hover {
+  border-color: var(--primary-color);
+}
+
+/* Contact Card Specific */
+.contact-card {
+  padding: 24px;
+  height: 180px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  background-color: var(--color-card);
+  border-radius: var(--border-radius);
+  border: 1px solid var(--color-border-light);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-normal);
+}
+
+.contact-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--secondary-color);
+}
+
+.contact-card-title {
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+}
+
+.contact-card-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.contact-card-item {
+  display: flex;
+  align-items: center;
+}
+
+.contact-card-icon {
+  color: var(--secondary-color);
+  margin-right: 12px;
+  font-size: 1.25rem;
+}
+
+.contact-card-text {
+  color: var(--text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.875rem;
+}
+
+/* Centered Cards (Units, Date, Registration) */
+.centered-card {
+  padding: 24px;
+  height: 180px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  background-color: var(--color-card);
+  border-radius: var(--border-radius);
+  border: 1px solid var(--color-border-light);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-normal);
+  text-align: center;
+}
+
+.centered-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.centered-card.units-card:hover {
+  border-color: var(--info);
+}
+
+.centered-card.date-card:hover {
+  border-color: var(--accent-color);
+}
+
+.centered-card.registration-card:hover {
+  border-color: var(--warning);
+}
+
+.centered-card-icon {
+  font-size: 2.5rem;
+  margin-bottom: 12px;
+}
+
+.centered-card-icon.units-icon {
+  color: var(--info);
+}
+
+.centered-card-icon.date-icon {
+  color: var(--accent-color);
+}
+
+.centered-card-icon.registration-icon {
+  color: var(--warning);
+}
+
+.centered-card-value {
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.centered-card-value.units-value {
+  font-size: 2.5rem;
+  color: var(--info);
+}
+
+.centered-card-label {
+  color: var(--text-secondary);
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+.centered-card-text {
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+  font-size: 1rem;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 80%;
+}
+
+/* Edit Icon */
+.edit-icon {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 50%;
+}
+
+.edit-icon:hover {
+  background-color: rgba(var(--primary-rgb), 0.1);
+}
+
+/* Financial Summary Section */
+.financial-summary-section {
+  margin-top: 32px;
+}
+
+.financial-summary-title {
+  color: var(--primary-color);
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.financial-summary-grid {
+  margin-bottom: 16px;
+}
+
+.financial-summary-card {
+  padding: 16px;
+  border-radius: var(--border-radius);
+}
+
+.financial-summary-card.income {
+  background-color: rgba(var(--success-rgb), 0.1);
+}
+
+.financial-summary-card.expense {
+  background-color: rgba(var(--warning-rgb), 0.1);
+}
+
+.financial-summary-card.balance {
+  background-color: rgba(var(--info-rgb), 0.1);
+}
+
+.financial-summary-card-label {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+}
+
+.financial-summary-card-value {
+  font-weight: 600;
+  font-size: 1.25rem;
+}
+
+.financial-summary-card-value.income {
+  color: var(--success);
+}
+
+.financial-summary-card-value.expense {
+  color: var(--warning);
+}
+
+.financial-summary-card-value.balance {
+  color: var(--info);
+}
+
+/* Action Buttons */
+.action-buttons {
+  margin-top: 32px;
+  display: flex;
+  gap: 16px;
+}
+
+.action-button {
+  height: 40px;
+  border-radius: var(--border-radius);
+  text-transform: none;
+  font-weight: 600;
+  box-shadow: var(--shadow-sm);
+}
+
+.action-button:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.action-button.primary {
+  width: 100%;
+}
+
+.action-button.outlined {
+  width: 100%;
+  color: var(--text-secondary);
+  border-color: var(--color-border-light);
+}
+
+.action-button.outlined:hover {
+  color: var(--primary-color);
+  border-color: var(--primary-color);
+  background-color: rgba(var(--primary-rgb), 0.05);
+}
+
+@media (min-width: 768px) {
+  .action-button.primary,
+  .action-button.outlined {
+    width: auto;
+  }
+}
+
+/* Loading and Error States */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  margin: 40px 0;
+}
+
+.loading-spinner {
+  color: var(--primary-color);
+}
+
+.container-no-padding {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.alert-error {
+  margin-top: 24px;
+  margin-bottom: 24px;
+  border-radius: var(--border-radius);
+  font-weight: 500;
+}
+
+.back-button {
+  color: var(--text-secondary);
+}
+
+.back-button:hover {
+  color: var(--primary-color);
+  background-color: rgba(var(--primary-rgb), 0.05);
+}
+
+.header-back-button {
+  margin-right: 16px;
+  color: var(--text-secondary);
+}
+
+.header-back-button:hover {
+  color: var(--primary-color);
+  background-color: rgba(var(--primary-rgb), 0.05);
+}
+
+/* Grid Spacing */
+.society-cards-grid {
+  margin-bottom: 32px;
+}
+
+/* Icon Colors */
+.icon-primary {
+  color: var(--primary-color);
+}
+
+.icon-primary-faded {
+  color: var(--primary-color);
+  opacity: 0.7;
+}
+
+.icon-edit {
+  font-size: 1.2rem;
+  color: var(--text-secondary);
+}
+
+.society-detail-card.contact-card:hover {
+  border-color: var(--secondary-color);
+}
+
+.society-detail-card.units-card:hover {
+  border-color: var(--info);
+}
+
+.society-detail-card.date-card:hover {
+  border-color: var(--accent-color);
+}
+
+.society-detail-card.registration-card:hover {
+  border-color: var(--warning);
+}
+
+.society-detail-card.committee-card:hover {
+  border-color: var(--primary-color);
+}
+
+.detail-card-edit-icon {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 50%;
+}
+
+.detail-card-edit-icon:hover {
+  background-color: rgba(var(--primary-rgb), 0.1);
+}
+
+.detail-card-title {
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+}
+
+.detail-card-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.detail-card-item {
+  display: flex;
+  align-items: center;
+}
+
+.detail-card-icon {
+  margin-right: 12px;
+  font-size: 1.25rem;
+}
+
+.detail-card-text {
+  color: var(--text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.875rem;
+}
+
+/* Committee Members Card Specific */
+.committee-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.committee-title-section {
+  display: flex;
+  align-items: center;
+}
+
+.committee-count-badge {
+  color: var(--text-secondary);
+  background-color: rgba(var(--primary-rgb), 0.1);
+  padding: 4px 12px;
+  border-radius: var(--border-radius);
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+.committee-member-list {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.committee-member-item {
+  display: flex;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: var(--border-radius);
+}
+
+.committee-member-item:hover {
+  background-color: rgba(var(--primary-rgb), 0.05);
+}
+
+.committee-member-info {
+  flex: 1;
+}
+
+.committee-member-name {
+  color: var(--text-primary);
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+.committee-member-name {
+  color: var(--text-primary);
+  font-weight: 500;
+  font-size: 0.875rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.committee-member-role {
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.committee-empty-state {
+  color: var(--text-secondary);
+  text-align: center;
+  padding: 16px 0;
+  font-style: italic;
+}
+
+.committee-actions {
+  padding-top: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.committee-actions.center {
+  justify-content: center;
+}
+
+.committee-more-text {
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+}
+
+.committee-view-all-btn {
+  font-size: 0.75rem;
+  text-transform: none;
+  color: var(--primary-color);
+  padding: 4px;
+  min-width: auto;
+}
+
+.committee-manage-btn {
+  font-size: 0.75rem;
+  text-transform: none;
+  border-color: var(--color-border-light);
+  color: var(--text-secondary);
+}
+
+.committee-manage-btn:hover {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+/* Centered Cards */
+.centered-card {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.centered-card-icon {
+  font-size: 2.5rem;
+  margin-bottom: 12px;
+}
+
+.centered-card-value {
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.centered-card-label {
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.centered-card-text {
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+  font-size: 1rem;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 80%;
+}
+
+/* Loading State */
+.loading-state {
+  display: flex;
+  justify-content: center;
+  margin: 40px 0;
+}
+
+.loading-spinner {
+  color: var(--primary-color);
+}
+
+/* Container Styles */
+.society-details-container .no-padding {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* Alert Styles */
+.alert-custom {
+  margin-top: 24px;
+  margin-bottom: 24px;
+  border-radius: var(--border-radius);
+  font-weight: 500;
+}
+
+/* Grid with margin bottom */
+.society-details-grid {
+  margin-bottom: 32px;
+}
+
+/* Icon Styles */
+.icon-edit-small {
+  font-size: 1.2rem;
+  color: var(--text-secondary);
+}
+
+.icon-location-primary {
+  color: var(--primary-color);
+}
+
+.icon-location-faded {
+  color: var(--primary-color);
+  opacity: 0.7;
+}
+
+.icon-group-faded {
+  color: var(--primary-color);
+  opacity: 0.5;
+}
+
+.icon-group-light {
+  color: var(--primary-color);
+  opacity: 0.7;
+}
+
+/* Committee Member Styles */
+.committee-member-details {
+  flex: 1;
+}
+
+.committee-member-name {
+  color: var(--text-primary);
+  font-weight: 500;
+  font-size: 0.875rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.committee-member-role {
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Financial Summary Transaction Value */
+.transaction-value {
+  font-weight: 600;
+}
+
+.transaction-value.income {
+  color: var(--success);
+}
+
+.transaction-value.expense {
+  color: var(--warning);
 }

@@ -1,15 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { 
   AppBar, 
   Toolbar, 
   IconButton, 
   Typography, 
-  Avatar, 
-  Box
+  Avatar,
+  Menu,
+  MenuItem,
+  Divider,
+  ListItemIcon,
+  ListItemText
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import PersonIcon from '@mui/icons-material/Person';
+import LogoutIcon from '@mui/icons-material/Logout';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import { useAuth } from '../contexts/AuthContext';
 import './Header.css';
 
 interface HeaderProps {
@@ -18,21 +25,14 @@ interface HeaderProps {
   isMobile: boolean;
 }
 
-interface User {
-  name: string;
-  role: string;
-  avatar: string | null;
-}
-
-const Header: React.FC<HeaderProps> = ({ drawerWidth, onMenuClick, isMobile }) => {
+const Header: React.FC<HeaderProps> = ({ drawerWidth: _drawerWidth, onMenuClick, isMobile }) => {
   const [hasScrolled, setHasScrolled] = useState<boolean>(false);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   
-  // Mock user data - in a real app, this would come from authentication context or props
-  const currentUser: User = {
-    name: "John Doe",
-    role: "Admin",
-    avatar: null // Placeholder for user avatar
-  };
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  
+  const isMenuOpen = Boolean(anchorEl);
   
   // Handle scroll effect
   useEffect(() => {
@@ -51,17 +51,34 @@ const Header: React.FC<HeaderProps> = ({ drawerWidth, onMenuClick, isMobile }) =
     };
   }, []);
 
+  const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleLogout = () => {
+    logout();
+    handleMenuClose();
+    navigate('/login');
+  };
+
+  const handleProfileClick = () => {
+    handleMenuClose();
+    // Navigate to profile page when it's created
+    // navigate('/profile');
+  };
+
   return (
     <AppBar
-      position="fixed"
-      className={hasScrolled ? 'scrolled' : ''}
+      className={`header-appbar ${hasScrolled ? 'header-appbar-scrolled' : ''}`}
     >
-      <Toolbar>
+      <Toolbar className="header-toolbar">
         {isMobile && (
           <IconButton
-            color="inherit"
             aria-label="open drawer"
-            edge="start"
             onClick={onMenuClick}
             className="header-mobile-menu"
           >
@@ -69,7 +86,7 @@ const Header: React.FC<HeaderProps> = ({ drawerWidth, onMenuClick, isMobile }) =
           </IconButton>
         )}
         
-        <Box className="header-logo-container">
+        <div className="header-logo-container">
           <img 
             src="/nivra-logo.png" 
             alt="Nivra Logo" 
@@ -77,40 +94,69 @@ const Header: React.FC<HeaderProps> = ({ drawerWidth, onMenuClick, isMobile }) =
           />
           <Typography
             variant="h6"
-            noWrap
             component={Link}
             to="/"
             className="header-title"
           >
             Nivra
           </Typography>
-        </Box>
+        </div>
         
-        <Box className="header-spacer" />
+        <div className="header-spacer" />
         
         {/* User profile */}
-        <Box 
-          component={Link} 
-          to="/profile"
-          className="header-user-profile"
+        <div className="header-user-profile">
+          <div 
+            className="header-user-profile-link header-user-profile-clickable"
+            onClick={handleProfileMenuOpen}
+          >
+            <Avatar className="header-user-avatar">
+              {user?.avatar ? (
+                <img src={user.avatar} alt={user.firstName} className="header-user-avatar-img" />
+              ) : (
+                <PersonIcon />
+              )}
+            </Avatar>
+            
+            <div className="header-user-info">
+              <Typography variant="subtitle2" className="header-user-name">
+                {user ? `${user.firstName} ${user.lastName}` : 'User'}
+              </Typography>
+              <Typography variant="caption" className="header-user-role">
+                {user?.role || 'Guest'}
+              </Typography>
+            </div>
+          </div>
+        </div>
+        
+        {/* User menu */}
+        <Menu
+          anchorEl={anchorEl}
+          open={isMenuOpen}
+          onClose={handleMenuClose}
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'right',
+          }}
+          transformOrigin={{
+            vertical: 'top',
+            horizontal: 'right',
+          }}
         >
-          <Avatar className="header-user-avatar">
-            {currentUser.avatar ? (
-              <img src={currentUser.avatar} alt={currentUser.name} />
-            ) : (
-              <PersonIcon />
-            )}
-          </Avatar>
-          
-          <Box className="header-user-info">
-            <Typography variant="subtitle2" className="header-user-name">
-              {currentUser.name}
-            </Typography>
-            <Typography variant="caption" className="header-user-role">
-              {currentUser.role}
-            </Typography>
-          </Box>
-        </Box>
+          <MenuItem onClick={handleProfileClick}>
+            <ListItemIcon>
+              <AccountCircleIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText>Profile</ListItemText>
+          </MenuItem>
+          <Divider />
+          <MenuItem onClick={handleLogout}>
+            <ListItemIcon>
+              <LogoutIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText>Logout</ListItemText>
+          </MenuItem>
+        </Menu>
       </Toolbar>
     </AppBar>
   );

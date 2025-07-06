@@ -1,0 +1,246 @@
+/* Pending Approval Page Styles */
+@import '../../styles/theme.css';
+
+.pending-approval-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #F2E5D5 0%, #F8F2E8 50%, #E8DCC6 100%);
+  padding: 24px 0;
+  display: flex;
+  align-items: center;
+}
+
+.pending-approval-paper {
+  padding: 48px 40px !important;
+  border-radius: 24px !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1) !important;
+  background: rgba(255, 255, 255, 0.95) !important;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  text-align: center;
+}
+
+.pending-approval-header {
+  margin-bottom: 32px;
+}
+
+.pending-approval-icon {
+  font-size: 4rem !important;
+  color: #5A9B97 !important;
+  margin-bottom: 16px;
+  animation: pulse 2s infinite;
+}
+
+.pending-approval-title {
+  color: #2C5F5D !important;
+  font-weight: 700 !important;
+  margin-bottom: 8px !important;
+}
+
+.pending-approval-subtitle {
+  color: #5A9B97 !important;
+  font-weight: 500 !important;
+  margin-bottom: 0 !important;
+}
+
+.pending-approval-card {
+  border-radius: 16px !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08) !important;
+  border: 1px solid rgba(44, 95, 93, 0.1) !important;
+  margin-bottom: 24px;
+}
+
+.pending-approval-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.status-title {
+  color: #2C5F5D !important;
+  font-weight: 600 !important;
+  margin: 0 !important;
+}
+
+.status-chip {
+  font-weight: 600 !important;
+}
+
+.status-chip.pending {
+  background-color: rgba(255, 152, 0, 0.1) !important;
+  color: #FF9800 !important;
+}
+
+.pending-approval-progress {
+  margin-bottom: 24px !important;
+  height: 6px !important;
+  border-radius: 3px !important;
+}
+
+.pending-approval-progress .MuiLinearProgress-bar {
+  background: linear-gradient(90deg, #2C5F5D, #5A9B97) !important;
+}
+
+.pending-approval-message {
+  text-align: left !important;
+  margin-bottom: 32px !important;
+  color: #333 !important;
+  line-height: 1.6 !important;
+}
+
+.pending-approval-info {
+  text-align: left;
+  margin-bottom: 32px;
+}
+
+.info-title {
+  color: #2C5F5D !important;
+  font-weight: 600 !important;
+  margin-bottom: 16px !important;
+}
+
+.pending-approval-steps {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.pending-approval-steps li {
+  padding: 8px 0;
+  position: relative;
+  padding-left: 24px;
+  color: #666;
+}
+
+.pending-approval-steps li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  top: 8px;
+  color: #5A9B97;
+  font-weight: bold;
+}
+
+.pending-approval-actions {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.back-button,
+.contact-button {
+  border-color: #5A9B97 !important;
+  color: #5A9B97 !important;
+  font-weight: 600 !important;
+  text-transform: none !important;
+  border-radius: 8px !important;
+  padding: 8px 24px !important;
+}
+
+.back-button:hover,
+.contact-button:hover {
+  border-color: #2C5F5D !important;
+  color: #2C5F5D !important;
+  background-color: rgba(44, 95, 93, 0.05) !important;
+}
+
+.pending-approval-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 24px;
+}
+
+.footer-text {
+  color: #666 !important;
+  margin: 0 !important;
+}
+
+.logout-button {
+  color: #5A9B97 !important;
+  font-weight: 600 !important;
+  text-transform: none !important;
+}
+
+.logout-button:hover {
+  color: #2C5F5D !important;
+  background-color: rgba(44, 95, 93, 0.05) !important;
+}
+
+/* Animations */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.pending-approval-paper {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .pending-approval-container {
+    padding: 16px;
+  }
+  
+  .pending-approval-paper {
+    padding: 32px 24px !important;
+  }
+  
+  .pending-approval-title {
+    font-size: 1.75rem !important;
+  }
+  
+  .pending-approval-status {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .pending-approval-actions {
+    flex-direction: column;
+  }
+  
+  .back-button,
+  .contact-button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .pending-approval-paper {
+    padding: 24px 16px !important;
+  }
+  
+  .pending-approval-title {
+    font-size: 1.5rem !important;
+  }
+  
+  .pending-approval-icon {
+    font-size: 3rem !important;
+  }
+}

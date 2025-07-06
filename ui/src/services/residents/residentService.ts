@@ -8,13 +8,18 @@ interface ResidentData {
   phone?: string;
   unit_number?: string;
   society_id: string | number;
-  society_name?: string;
+  society?: {
+    id: string | number;
+    name: string;
+    city: string;
+    state: string;
+  };
   is_owner: boolean;
   is_committee_member: boolean;
   committee_role?: string;
   is_active: boolean;
-  joined_date?: string;
-  lease_end_date?: string;
+  move_in_date?: string;
+  move_out_date?: string;
   emergency_contact?: string;
   emergency_phone?: string;
   notes?: string;
@@ -68,7 +73,7 @@ const residentService = {
 
   // Get resident finances summary
   getResidentFinancesSummary: async (residentId: string | number): Promise<ResidentFinancesSummary> => {
-    const response = await apiClient.get(`/api/v1/residents/${residentId}/finance-summary`);
+    const response = await apiClient.get(`/residents/${residentId}/finance-summary`);
     return response.data;
   }
 };

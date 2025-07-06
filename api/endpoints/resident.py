@@ -1,6 +1,6 @@
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from uuid import UUID
 
 import sys
@@ -39,6 +39,14 @@ def get_residents(
     if unit_number:
         query = query.filter(models.Resident.unit_number == unit_number)
     
+    # Order by unit_number alphabetically, then by last_name, then by first_name
+    # Handle cases where unit_number might be None by putting them at the end
+    query = query.order_by(
+        models.Resident.unit_number.asc().nulls_last(),
+        models.Resident.last_name.asc(),
+        models.Resident.first_name.asc()
+    )
+    
     residents = query.offset(skip).limit(limit).all()
     return residents
 
@@ -46,11 +54,12 @@ def get_residents(
 @router.get("/residents/{resident_id}", response_model=schemas.Resident)
 def get_resident(resident_id: UUID, db: Session = Depends(get_db)):
     """
-    Get a specific resident by ID.
+    Get a specific resident by ID with society information.
     """
-    resident = db.query(models.Resident).filter(models.Resident.id == resident_id).first()
+    resident = db.query(models.Resident).options(joinedload(models.Resident.society)).filter(models.Resident.id == resident_id).first()
     if resident is None:
         raise HTTPException(status_code=404, detail="Resident not found")
+    
     return resident
 
 
@@ -64,13 +73,16 @@ def create_resident(resident: schemas.ResidentCreate, db: Session = Depends(get_
     if not society:
         raise HTTPException(status_code=404, detail="Society not found")
     
-    # Check if email already exists
-    if resident.email:
-        existing_resident = db.query(models.Resident).filter(
-            models.Resident.email == resident.email
+    # Check if unit already exists in the same society (only if unit_number is provided)
+    if resident.unit_number:
+        existing_unit = db.query(models.Resident).filter(
+            models.Resident.society_id == resident.society_id,
+            models.Resident.unit_number == resident.unit_number
         ).first()
-        if existing_resident:
-            raise HTTPException(status_code=400, detail="Email already registered")
+        # Allow multiple residents in the same unit (family members)
+        # Just log a warning but don't block the creation
+        if existing_unit:
+            print(f"Warning: Unit {resident.unit_number} already has residents in society {resident.society_id}")
     
     db_resident = models.Resident(**resident.dict())
     db.add(db_resident)
@@ -98,13 +110,17 @@ def update_resident(
         if not society:
             raise HTTPException(status_code=404, detail="Society not found")
     
-    # Check if email already exists if email is being updated
-    if resident_update.email and resident_update.email != db_resident.email:
-        existing_resident = db.query(models.Resident).filter(
-            models.Resident.email == resident_update.email
+    # Removed email uniqueness validation - multiple residents can share the same email (family members)
+    # Just log if unit is being changed and already exists
+    if resident_update.unit_number and resident_update.unit_number != db_resident.unit_number:
+        society_id = resident_update.society_id or db_resident.society_id
+        existing_unit = db.query(models.Resident).filter(
+            models.Resident.society_id == society_id,
+            models.Resident.unit_number == resident_update.unit_number,
+            models.Resident.id != resident_id  # Exclude current resident
         ).first()
-        if existing_resident:
-            raise HTTPException(status_code=400, detail="Email already registered")
+        if existing_unit:
+            print(f"Warning: Unit {resident_update.unit_number} already has residents in society {society_id}")
     
     update_data = resident_update.dict(exclude_unset=True)
     for key, value in update_data.items():

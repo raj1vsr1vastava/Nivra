@@ -43,6 +43,7 @@ INSERT INTO residents (
     is_committee_member,
     committee_role,
     move_in_date,
+    move_out_date,
     is_active
 ) 
 VALUES
@@ -57,6 +58,7 @@ VALUES
     TRUE,
     'Secretary',
     '2021-01-15',
+    NULL,
     TRUE
 ),
 (
@@ -70,6 +72,7 @@ VALUES
     FALSE,
     NULL,
     '2021-03-10',
+    NULL,
     TRUE
 ),
 (
@@ -83,6 +86,7 @@ VALUES
     TRUE,
     'President',
     '2019-05-20',
+    NULL,
     TRUE
 );
 

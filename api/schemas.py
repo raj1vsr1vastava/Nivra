@@ -47,8 +47,6 @@ class Society(SocietyBase):
 
     class Config:
         from_attributes = True
-        orm_mode = True
-        orm_mode = True
 
 
 # Resident Schemas
@@ -89,13 +87,12 @@ class Resident(ResidentBase):
     is_active: bool
     created_at: datetime
     updated_at: datetime
-    # Uncomment this if you want to include society data in resident responses
-    # society: Optional['Society'] = None
+    # Include society data in resident responses
+    society: Optional['Society'] = None
 
     class Config:
         from_attributes = True
-        orm_mode = True
-        orm_mode = True
+        from_attributes = True
 
 
 # ResidentFinance Schemas
@@ -138,7 +135,7 @@ class ResidentFinance(ResidentFinanceBase):
 
     class Config:
         from_attributes = True
-        orm_mode = True
+        from_attributes = True
 
 
 # RBAC Schemas
@@ -164,7 +161,7 @@ class Role(RoleBase):
 
     class Config:
         from_attributes = True
-        orm_mode = True
+        from_attributes = True
 
 
 # Permission Schemas
@@ -193,7 +190,7 @@ class Permission(PermissionBase):
 
     class Config:
         from_attributes = True
-        orm_mode = True
+        from_attributes = True
 
 
 # User Schemas
@@ -227,7 +224,7 @@ class User(UserBase):
 
     class Config:
         from_attributes = True
-        orm_mode = True
+        from_attributes = True
 
 
 # RolePermission Schemas
@@ -246,7 +243,7 @@ class RolePermission(RolePermissionBase):
 
     class Config:
         from_attributes = True
-        orm_mode = True
+        from_attributes = True
 
 
 # SocietyAdmin Schemas
@@ -271,7 +268,7 @@ class SocietyAdmin(SocietyAdminBase):
 
     class Config:
         from_attributes = True
-        orm_mode = True
+        from_attributes = True
 
 
 # Authentication Schemas
@@ -339,4 +336,17 @@ class SocietyFinance(SocietyFinanceBase):
 
     class Config:
         from_attributes = True
-        orm_mode = True
+        from_attributes = True
+
+
+class SignupRequest(BaseModel):
+    username: str
+    email: EmailStr
+    full_name: str
+    password: str
+    phone: Optional[str] = None
+
+
+class LoginRequest(BaseModel):
+    username: str
+    password: str

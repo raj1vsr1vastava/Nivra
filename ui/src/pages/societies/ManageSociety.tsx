@@ -13,7 +13,8 @@ import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { societyService } from '../../services';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import SaveIcon from '@mui/icons-material/Save';
-import './SocietyEdit.css'; // Use dedicated CSS file
+import '../../styles/shared-headers.css';
+import './ManageSociety.css';
 import { SocietyData } from '../../types';
 
 // Define extended Society interface that includes all the properties we'll use
@@ -83,7 +84,7 @@ const SocietyTextField: React.FC<SocietyTextFieldProps> = React.memo(({
   const isHighlighted = highlightedFields.includes(name);
   
   return (
-    <div className={isHighlighted ? 'society-edit-field-highlighted' : ''}>
+    <div className={isHighlighted ? 'manage-society-field-highlighted' : ''}>
       <TextField
         required={required}
         fullWidth
@@ -98,13 +99,13 @@ const SocietyTextField: React.FC<SocietyTextFieldProps> = React.memo(({
         InputProps={InputProps}
         InputLabelProps={InputLabelProps}
         ref={fieldRef}
-        className="society-edit-text-field"
+        className="manage-society-text-field"
       />
     </div>
   );
 });
 
-const SocietyEdit: React.FC = () => {
+const ManageSociety: React.FC = () => {
   const params = useParams<RouteParams>();
   const societyId = params.societyId;
   const navigate = useNavigate();
@@ -246,8 +247,6 @@ const SocietyEdit: React.FC = () => {
       });
     }
   };
-
-  // Removed handleSelectChange as it's not needed
 
   // Helper function to validate required fields
   const validateRequiredField = (value: string | undefined, fieldName: string, displayName: string, errors: FieldErrors) => {
@@ -431,8 +430,8 @@ const SocietyEdit: React.FC = () => {
 
   // Helper function to render form sections
   const renderFormSection = (title: string, children: React.ReactNode) => (
-    <Box className="society-edit-section">
-      <Typography variant="h6" className="society-edit-section-title">
+    <Box className="manage-society-section">
+      <Typography variant="h6" className="manage-society-section-title">
         {title}
       </Typography>
       {children}
@@ -441,10 +440,10 @@ const SocietyEdit: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="society-edit-container">
-        <Container maxWidth="xl" className="society-edit-container-max-width">
-          <Box className="society-edit-loading-container">
-            <CircularProgress size={40} className="society-edit-loading-spinner" />
+      <div className="manage-society-container">
+        <Container maxWidth="xl" className="manage-society-container-max-width">
+          <Box className="manage-society-loading-container">
+            <CircularProgress size={40} className="manage-society-loading-spinner" />
           </Box>
         </Container>
       </div>
@@ -453,11 +452,11 @@ const SocietyEdit: React.FC = () => {
 
   if (error && !society) {
     return (
-      <div className="society-edit-container">
-        <Container maxWidth="xl" className="society-edit-container-max-width">
+      <div className="manage-society-container">
+        <Container maxWidth="xl" className="manage-society-container-max-width">
           <Alert 
             severity="error" 
-            className="society-edit-error-alert"
+            className="manage-society-error-alert"
           >
             {error}
           </Alert>
@@ -465,7 +464,7 @@ const SocietyEdit: React.FC = () => {
             variant="outlined"
             startIcon={<ArrowBackIcon />} 
             onClick={() => navigate(societyId ? `/societies/${societyId}` : '/societies')}
-            className="society-edit-back-button"
+            className="manage-society-back-button"
           >
             {societyId ? 'Back to Society Details' : 'Back to Societies'}
           </Button>
@@ -476,11 +475,11 @@ const SocietyEdit: React.FC = () => {
 
   if (!society) {
     return (
-      <div className="society-edit-container">
-        <Container maxWidth="xl" className="society-edit-container-max-width">
+      <div className="manage-society-container">
+        <Container maxWidth="xl" className="manage-society-container-max-width">
           <Alert 
             severity="warning" 
-            className="society-edit-error-alert"
+            className="manage-society-error-alert"
           >
             Society not found
           </Alert>
@@ -488,7 +487,7 @@ const SocietyEdit: React.FC = () => {
             variant="outlined"
             startIcon={<ArrowBackIcon />} 
             onClick={() => navigate('/societies')}
-            className="society-edit-back-button"
+            className="manage-society-back-button"
           >
             Back to Societies
           </Button>
@@ -498,10 +497,10 @@ const SocietyEdit: React.FC = () => {
   }
 
   return (
-    <div className="society-edit-container">
-      <Container maxWidth="xl" className="society-edit-container-max-width">
-        <div className="society-edit-header">
-          <h1 className="society-edit-header-title">
+    <div className="manage-society-container">
+      <Container maxWidth="xl" className="manage-society-container-max-width">
+        <div className="page-header">
+          <h1 className="page-header-title">
             {societyId ? society.name : 'Add New Society'}
           </h1>
         </div>
@@ -509,13 +508,13 @@ const SocietyEdit: React.FC = () => {
         {error && (
           <Alert 
             severity="error" 
-            className="society-edit-inline-error-alert"
+            className="manage-society-inline-error-alert"
           >
             {error}
           </Alert>
         )}
 
-        <Box component="form" onSubmit={handleSubmit} className="society-edit-form">
+        <Box component="form" onSubmit={handleSubmit} className="manage-society-form">
           {renderFormSection("Basic Information", (
             <Grid container spacing={3}>
               <Grid item xs={12}>
@@ -682,11 +681,11 @@ const SocietyEdit: React.FC = () => {
             </Grid>
           ))}
           
-          <Box className="society-edit-form-actions">
+          <Box className="manage-society-form-actions">
             <Button
               variant="outlined"
               onClick={() => navigate(societyId ? `/societies/${societyId}` : '/societies')}
-              className="society-edit-button society-edit-button-cancel"
+              className="manage-society-button manage-society-button-cancel"
             >
               Cancel
             </Button>
@@ -695,7 +694,7 @@ const SocietyEdit: React.FC = () => {
               variant="contained"
               color="primary"
               startIcon={<SaveIcon />}
-              className="society-edit-button"
+              className="manage-society-button"
             >
               {societyId ? 'Save Changes' : 'Create Society'}
             </Button>
@@ -706,4 +705,4 @@ const SocietyEdit: React.FC = () => {
   );
 };
 
-export default SocietyEdit;
+export default ManageSociety;

@@ -13,88 +13,11 @@
   padding-right: 0;
 }
 
-.societies-header {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  align-items: flex-start;
-  margin-bottom: 24px;
-  position: relative;
-  padding: 0 8px;
-}
-
-.societies-header-title {
-  margin: 4px 0;
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: var(--text-primary);
-  position: relative;
-  padding-bottom: 4px;
-}
-
-@media (min-width: 768px) {
-  .societies-header {
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-  }
-}
-
-/* Header Actions Container */
-.societies-header-actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-  width: 100%;
-}
-
-@media (min-width: 768px) {
-  .societies-header-actions {
-    gap: 16px;
-    flex-wrap: nowrap;
-    width: auto;
-  }
-}
-
-/* Search Field Container */
-.societies-search-container {
-  display: flex;
-  flex-grow: 1;
-  max-width: 100%;
-  min-width: 100%;
-  order: 2;
-}
-
-@media (min-width: 768px) {
-  .societies-search-container {
-    max-width: 300px;
-    min-width: 200px;
-    order: 1;
-  }
-}
-
 /* Search Field Styling */
 .search-field .MuiOutlinedInput-root {
   border-radius: var(--border-radius);
   height: 40px;
   font-size: 0.875rem;
-}
-
-/* Add Society Button */
-.societies-add-button {
-  order: 1;
-  width: 100%;
-  margin-left: 0;
-  height: 40px;
-}
-
-@media (min-width: 768px) {
-  .societies-add-button {
-    order: 3;
-    width: auto;
-    margin-left: 8px;
-  }
 }
 
 /* Loading Spinner Container */
@@ -161,18 +84,15 @@
 .society-stat-item {
   text-align: center;
   padding: 8px 12px;
-  background-color: var(--light-bg);
+  background-color: rgba(255, 255, 255, 0.05);
   border-radius: var(--border-radius);
 }
 
 /* No Societies Found */
 .no-societies {
-  margin-top: 16px;
-  padding: 24px;
   text-align: center;
-  border-radius: var(--border-radius);
-  background-color: white;
-  box-shadow: var(--card-shadow);
+  padding: 2.5rem;
+  margin: 1rem;
 }
 
 .no-societies-alert {

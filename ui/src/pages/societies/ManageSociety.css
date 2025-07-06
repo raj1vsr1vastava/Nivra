@@ -1,36 +1,18 @@
-/* Society Edit Page Styles */
+/* Manage Society Page Styles */
 @import '../../styles/theme.css';
 
-.society-edit-container {
+.manage-society-container {
   padding: 16px 0;
   min-height: 100vh;
   width: 100%;
   box-sizing: border-box;
 }
 
-.society-edit-header {
-  display: flex;
-  align-items: center;
-  margin-bottom: 16px;
-  position: relative;
-  padding: 0 8px;
-}
-
-.society-edit-header-title {
-  flex-grow: 1;
-  margin: 0 0 2px 0;
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: var(--text-primary);
-  position: relative;
-  padding-bottom: 4px;
-}
-
-.society-edit-form {
+.manage-society-form {
   margin-bottom: 24px;
 }
 
-.society-edit-section {
+.manage-society-section {
   background-color: white;
   padding: 24px 24px;
   border-radius: var(--border-radius);
@@ -38,128 +20,128 @@
   margin-bottom: 16px;
 }
 
-.society-edit-section-title {
+.manage-society-section-title {
   margin-bottom: 16px;
   padding-bottom: 16px;
   font-weight: 600;
   color: var(--text-primary);
 }
 
-.society-edit-form-actions {
+.manage-society-form-actions {
   display: flex;
   gap: 16px;
   margin-top: 16px;
 }
 
-.society-edit-button {
+.manage-society-button {
   height: 40px;
 }
 
-.society-edit-button-cancel {
+.manage-society-button-cancel {
   color: var(--text-secondary);
 }
 
-.society-edit-button-cancel:hover {
+.manage-society-button-cancel:hover {
   color: var(--primary-color);
   border-color: var(--primary-color);
 }
 
-.society-edit-loading-container {
+.manage-society-loading-container {
   display: flex;
   justify-content: center;
   margin: 40px 0;
 }
 
-.society-edit-loading-spinner {
+.manage-society-loading-spinner {
   color: var(--primary-color);
 }
 
-.society-edit-error-alert {
+.manage-society-error-alert {
   margin-top: 24px;
   margin-bottom: 24px;
   border-radius: var(--border-radius);
   font-weight: 500;
 }
 
-.society-edit-back-button {
+.manage-society-back-button {
   height: 40px;
   color: var(--text-secondary);
 }
 
-.society-edit-back-button:hover {
+.manage-society-back-button:hover {
   color: var(--primary-color);
   border-color: var(--primary-color);
   background: rgba(var(--primary-rgb), 0.05);
 }
 
-.society-edit-container-max-width {
+.manage-society-container-max-width {
   padding-left: 0;
   padding-right: 0;
 }
 
-.society-edit-inline-error-alert {
+.manage-society-inline-error-alert {
   margin-bottom: 24px;
   border-radius: var(--border-radius);
 }
 
 /* Field highlighting styles - simple and stable */
-.society-edit-field-highlighted {
+.manage-society-field-highlighted {
   position: relative;
 }
 
-.society-edit-field-highlighted .MuiOutlinedInput-root {
+.manage-society-field-highlighted .MuiOutlinedInput-root {
   background-color: rgba(25, 118, 210, 0.08) !important;
   box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.3) !important;
 }
 
-.society-edit-field-highlighted .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline {
+.manage-society-field-highlighted .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline {
   border-color: #1976d2 !important;
   border-width: 2px !important;
 }
 
-.society-edit-field-highlighted .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
+.manage-society-field-highlighted .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
   border-color: #1976d2 !important;
   border-width: 2px !important;
 }
 
-.society-edit-field-highlighted .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+.manage-society-field-highlighted .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
   border-color: #1976d2 !important;
   border-width: 2px !important;
 }
 
 /* Text field group styles */
-.society-edit-text-field {
+.manage-society-text-field {
   margin-bottom: 6px;
 }
 
-.society-edit-text-field .MuiOutlinedInput-root {
+.manage-society-text-field .MuiOutlinedInput-root {
   transition: all 0.3s ease;
 }
 
-.society-edit-text-field .MuiOutlinedInput-root:hover {
+.manage-society-text-field .MuiOutlinedInput-root:hover {
   background-color: rgba(0, 0, 0, 0.02);
 }
 
-.society-edit-text-field .MuiOutlinedInput-root.Mui-focused {
+.manage-society-text-field .MuiOutlinedInput-root.Mui-focused {
   background-color: rgba(25, 118, 210, 0.05);
 }
 
 /* Additional spacing for form sections */
-.society-edit-form .MuiGrid-container {
+.manage-society-form .MuiGrid-container {
   margin-top: 4px;
 }
 
-.society-edit-form .MuiGrid-item {
+.manage-society-form .MuiGrid-item {
   padding-bottom: 12px;
 }
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-  .society-edit-form-actions {
+  .manage-society-form-actions {
     flex-direction: column;
   }
   
-  .society-edit-button {
+  .manage-society-button {
     width: 100%;
   }
 }

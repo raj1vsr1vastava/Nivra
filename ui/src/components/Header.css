@@ -1,5 +1,5 @@
 /* Header Component Styling - MUI Compatible */
-.MuiAppBar-root {
+.header-appbar {
   background-color: #F2E5D5 !important;
   color: #2C5F5D !important;
   width: 100% !important;
@@ -10,19 +10,20 @@
   border: none !important;
 }
 
-.MuiAppBar-root.scrolled {
+.header-appbar.header-appbar-scrolled {
   box-shadow: none !important;
   background-color: #F2E5D5 !important;
 }
 
 /* Override Material-UI AppBar background specifically */
-.MuiAppBar-root.MuiAppBar-colorPrimary {
+.header-appbar.MuiAppBar-colorPrimary {
   background-color: #F2E5D5 !important;
 }
 
-.MuiAppBar-root .MuiToolbar-root {
+.header-toolbar {
   background-color: #F2E5D5 !important;
   color: #2C5F5D !important;
+  padding: 0 16px !important;
 }
 
 /* Nivra Logo Styling */
@@ -45,6 +46,7 @@
   color: #2C5F5D !important;
   font-weight: bold !important;
   font-size: 2rem !important;
+  white-space: nowrap;
 }
 
 .header-title:hover {
@@ -60,12 +62,25 @@
 .header-user-profile {
   display: flex;
   align-items: center;
+}
+
+.header-user-profile-link {
+  display: flex;
+  align-items: center;
   text-decoration: none;
+  color: #2C5F5D;
+  padding: 8px;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+}
+
+.header-user-profile-link:hover {
+  background-color: rgba(44, 95, 93, 0.1);
   color: #2C5F5D;
 }
 
-.header-user-profile:hover {
-  color: #2C5F5D;
+.header-user-profile-clickable {
+  cursor: pointer;
 }
 
 /* User Avatar Styling */
@@ -74,6 +89,13 @@
   height: 32px !important;
   background-color: #2C5F5D !important;
   color: white !important;
+}
+
+.header-user-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
 }
 
 /* User Info Container */
@@ -86,11 +108,13 @@
   font-weight: bold !important;
   line-height: 1.2 !important;
   color: #2C5F5D !important;
+  margin: 0 !important;
 }
 
 .header-user-role {
   color: #5A9B97 !important;
   line-height: 1 !important;
+  margin: 0 !important;
 }
 
 /* Mobile Menu Button */
@@ -103,6 +127,10 @@
 @media (max-width: 599px) {
   .header-user-info {
     display: none !important;
+  }
+  
+  .header-user-profile-link {
+    padding: 4px !important;
   }
 }
 
