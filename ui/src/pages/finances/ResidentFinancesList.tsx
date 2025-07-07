@@ -34,6 +34,7 @@ import {
 import { financeService, residentService, societyService } from '../../services';
 import { FinanceData as ServiceFinanceData } from '../../services/finances/financeService';
 import { ResidentData as ServiceResidentData } from '../../services/residents/residentService';
+import { useAuth } from '../../contexts/AuthContext';
 import { 
   SocietyData, 
   FinanceData, 
@@ -83,6 +84,7 @@ const transactionTypeOptions: SelectOption[] = [
 ];
 
 const ResidentFinancesList: React.FC = () => {
+  const { user } = useAuth();
   // State variables
   const [finances, setFinances] = useState<FinanceData[]>([]);
   const [filteredFinances, setFilteredFinances] = useState<FinanceData[]>([]);
@@ -117,8 +119,22 @@ const ResidentFinancesList: React.FC = () => {
         setLoading(true);
         
         // Fetch societies
-        const societiesData = await societyService.getAllSocieties();
-        setSocieties(societiesData as SocietyData[]);
+        let societiesData: SocietyData[];
+        
+        // If user is a society admin, only fetch societies they administer
+        if (user?.role === 'society_admin' && user.id) {
+          societiesData = await societyService.getAdministeredSocieties(user.id);
+        } else {
+          // For system admins and other roles, fetch all societies
+          societiesData = await societyService.getAllSocieties();
+        }
+        
+        setSocieties(societiesData);
+        
+        // For society admins, automatically set the society filter to their administered society
+        if (user?.role === 'society_admin' && societiesData.length > 0) {
+          setSocietyFilter(String(societiesData[0].id));
+        }
         
         // Fetch finances
         const financesData = await financeService.getAllFinances();
@@ -149,7 +165,7 @@ const ResidentFinancesList: React.FC = () => {
     };
     
     fetchData();
-  }, []);
+  }, [user]);
   
   // Calculate summary statistics
   const calculateSummary = (financeData: FinanceData[]): void => {
@@ -391,25 +407,27 @@ const ResidentFinancesList: React.FC = () => {
             </Typography>
           </Box>
           <div className="filters-grid">
-            <div className="filter-item">
-              <FormControl fullWidth size="small">
-                <InputLabel id="society-filter-label">Society</InputLabel>
-                <Select
-                  labelId="society-filter-label"
-                  id="society-filter"
-                  value={societyFilter}
-                  label="Society"
-                  onChange={handleSocietyFilterChange}
-                >
-                  <MenuItem value="">All Societies</MenuItem>
-                  {societies.map((society) => (
-                    <MenuItem key={society.id} value={society.id}>
-                      {society.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </div>
+            {user?.role !== 'society_admin' && (
+              <div className="filter-item">
+                <FormControl fullWidth size="small">
+                  <InputLabel id="society-filter-label">Society</InputLabel>
+                  <Select
+                    labelId="society-filter-label"
+                    id="society-filter"
+                    value={societyFilter}
+                    label="Society"
+                    onChange={handleSocietyFilterChange}
+                  >
+                    <MenuItem value="">All Societies</MenuItem>
+                    {societies.map((society) => (
+                      <MenuItem key={society.id} value={society.id}>
+                        {society.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </div>
+            )}
             
             <div className="filter-item">
               <FormControl fullWidth size="small">
@@ -420,7 +438,7 @@ const ResidentFinancesList: React.FC = () => {
                   value={residentFilter}
                   label="Resident"
                   onChange={handleResidentFilterChange}
-                  disabled={!societyFilter}
+                  disabled={!societyFilter && user?.role !== 'society_admin'}
                 >
                   <MenuItem value="">All Residents</MenuItem>
                   {residents

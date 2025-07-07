@@ -11,6 +11,7 @@ import {
 import CardDetails from '../../components/CardDetails';
 import { useParams, useNavigate } from 'react-router-dom';
 import { societyService } from '../../services';
+import { useAuth } from '../../contexts/AuthContext';
 import EditIcon from '@mui/icons-material/Edit';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
@@ -62,6 +63,7 @@ const SocietyDetails: React.FC = () => {
   const params = useParams<RouteParams>();
   const societyId = params.societyId;
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [society, setSociety] = useState<Society | null>(null);
   const [financesSummary, setFinancesSummary] = useState<FinancesSummary | null>(null);
   const [committeeMembers, setCommitteeMembers] = useState<ResidentData[]>([]);
@@ -144,12 +146,14 @@ const SocietyDetails: React.FC = () => {
           >
             {error}
           </Alert>
-          <IconButton 
-            onClick={() => navigate('/societies')}
-            className="back-button-header"
-          >
-            <ArrowBackIcon />
-          </IconButton>
+          {user?.role !== 'society_admin' && (
+            <IconButton 
+              onClick={() => navigate('/societies')}
+              className="back-button-header"
+            >
+              <ArrowBackIcon />
+            </IconButton>
+          )}
         </Container>
       </div>
     );
@@ -165,12 +169,14 @@ const SocietyDetails: React.FC = () => {
           >
             Society not found
           </Alert>
-          <IconButton 
-            onClick={() => navigate('/societies')}
-            className="back-button-header"
-          >
-            <ArrowBackIcon />
-          </IconButton>
+          {user?.role !== 'society_admin' && (
+            <IconButton 
+              onClick={() => navigate('/societies')}
+              className="back-button-header"
+            >
+              <ArrowBackIcon />
+            </IconButton>
+          )}
         </Container>
       </div>
     );
@@ -185,12 +191,14 @@ const SocietyDetails: React.FC = () => {
       <Container maxWidth="xl" className="no-padding">
         <div className="page-header">
           <div className="page-title-section">
-            <IconButton 
-              onClick={() => navigate('/societies')}
-              className="page-back-button"
-            >
-              <ArrowBackIcon />
-            </IconButton>
+            {user?.role !== 'society_admin' && (
+              <IconButton 
+                onClick={() => navigate('/societies')}
+                className="page-back-button"
+              >
+                <ArrowBackIcon />
+              </IconButton>
+            )}
             <h1 className="page-header-title">
               {society.name}
             </h1>

@@ -4,6 +4,7 @@ import { ThemeProvider } from '@mui/material';
 import { AuthProvider } from './contexts/AuthContext';
 import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
+import SocietyAdminRedirect from './components/SocietyAdminRedirect';
 import Login from './pages/login/Login';
 import SocietySelection from './pages/society-selection/SocietySelection';
 import PendingApproval from './pages/pending-approval/PendingApproval';
@@ -48,7 +49,9 @@ const App: React.FC = () => {
             <Route path="/societies" element={
               <ProtectedRoute>
                 <Layout>
-                  <SocietiesList />
+                  <SocietyAdminRedirect>
+                    <SocietiesList />
+                  </SocietyAdminRedirect>
                 </Layout>
               </ProtectedRoute>
             } />

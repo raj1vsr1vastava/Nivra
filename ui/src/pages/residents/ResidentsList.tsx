@@ -18,6 +18,7 @@ import AddIcon from '@mui/icons-material/Add';
 import SearchIcon from '@mui/icons-material/Search';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import { useAuth } from '../../contexts/AuthContext';
 import { SocietyData } from '../../types';
 import '../../styles/shared-headers.css';
 import './ResidentsList.css';
@@ -46,6 +47,7 @@ type RouteParams = {
 const ResidentsList: React.FC = () => {
   const navigate = useNavigate();
   const params = useParams<RouteParams>();
+  const { user } = useAuth();
   const societyId = params.societyId;
   const [residents, setResidents] = useState<Resident[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -66,7 +68,16 @@ const ResidentsList: React.FC = () => {
   useEffect(() => {
     const fetchSocieties = async (): Promise<void> => {
       try {
-        const data = await societyService.getAllSocieties();
+        let data: SocietyData[];
+        
+        // If user is a society admin, only fetch societies they administer
+        if (user?.role === 'society_admin' && user.id) {
+          data = await societyService.getAdministeredSocieties(user.id);
+        } else {
+          // For system admins and other roles, fetch all societies
+          data = await societyService.getAllSocieties();
+        }
+        
         setSocieties(data);
       } catch (err) {
         console.error('Error fetching societies:', err);
@@ -74,7 +85,7 @@ const ResidentsList: React.FC = () => {
     };
     
     fetchSocieties();
-  }, []);
+  }, [user]);
 
   // Fetch current society details when societyId is provided
   useEffect(() => {
@@ -173,7 +184,7 @@ const ResidentsList: React.FC = () => {
                 size="small"
               />
             </Box>
-            {!societyId && (
+            {!societyId && user?.role !== 'society_admin' && (
               <Box className="page-filter-container">
                 <FormControl fullWidth size="small" className="residents-form-control">
                   <InputLabel id="society-select-label">Filter by Society</InputLabel>

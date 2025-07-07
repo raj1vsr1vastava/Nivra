@@ -14,6 +14,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import EmailIcon from '@mui/icons-material/Email';
 import PhoneIcon from '@mui/icons-material/Phone';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 import { SocietyData } from '../../types';
 import '../../styles/shared-headers.css';
 import './SocietiesList.css';
@@ -37,15 +38,25 @@ const SocietiesList: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>('');
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   useEffect(() => {
     fetchSocieties();
-  }, []);
+  }, [user]);
 
   const fetchSocieties = async (): Promise<void> => {
     try {
       setLoading(true);
-      const data = await societyService.getAllSocieties();
+      let data: SocietyData[];
+      
+      // If user is a society admin, only fetch societies they administer
+      if (user?.role === 'society_admin' && user.id) {
+        data = await societyService.getAdministeredSocieties(user.id);
+      } else {
+        // For system admins and other roles, fetch all societies
+        data = await societyService.getAllSocieties();
+      }
+      
       // Transform the data to match the Society interface
       const transformedData = data.map(society => ({
         ...society,

@@ -45,6 +45,12 @@ const societyService = {
     return response.data;
   },
 
+  // Get societies administered by a specific user
+  getAdministeredSocieties: async (userId: string): Promise<SocietyData[]> => {
+    const response = await apiClient.get(`/users/${userId}/administered-societies`);
+    return response.data;
+  },
+
   // Get society by ID
   getSocietyById: async (societyId: string | number): Promise<SocietyData> => {
     const response = await apiClient.get(`/societies/${societyId}`);

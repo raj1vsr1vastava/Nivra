@@ -18,6 +18,7 @@ import Grid from '../../components/shared/Grid';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import residentService from '../../services/residents/residentService';
 import { societyService } from '../../services';
+import { useAuth } from '../../contexts/AuthContext';
 import SaveIcon from '@mui/icons-material/Save';
 import '../../styles/shared-headers.css';
 import './ManageResident.css';
@@ -76,6 +77,7 @@ type RouteParams = {
 const ManageResident: React.FC = () => {
   const params = useParams<RouteParams>();
   const [searchParams] = useSearchParams();
+  const { user } = useAuth();
   const residentId = params.residentId;
   const societyId = params.societyId || searchParams.get('societyId');
   const navigate = useNavigate();
@@ -98,9 +100,23 @@ const ManageResident: React.FC = () => {
     // Always fetch societies for the dropdown in add mode
     fetchSocieties();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [residentId]);
+  }, [residentId, user]);
 
-  const initializeNewResident = (): void => {
+  const initializeNewResident = async (): Promise<void> => {
+    let defaultSocietyId = societyId || '';
+    
+    // For society admins, set the default society to their administered society
+    if (user?.role === 'society_admin' && user.id && !defaultSocietyId) {
+      try {
+        const administeredSocieties = await societyService.getAdministeredSocieties(user.id);
+        if (administeredSocieties.length > 0) {
+          defaultSocietyId = String(administeredSocieties[0].id);
+        }
+      } catch (err) {
+        console.error('Error fetching administered societies:', err);
+      }
+    }
+    
     const newResident: Resident = {
       id: '',
       first_name: '',
@@ -109,7 +125,7 @@ const ManageResident: React.FC = () => {
       email: '',
       phone: '',
       unit_number: '',
-      society_id: societyId || '',
+      society_id: defaultSocietyId,
       is_owner: true,
       is_committee_member: false,
       committee_role: '',
@@ -127,7 +143,16 @@ const ManageResident: React.FC = () => {
 
   const fetchSocieties = async (): Promise<void> => {
     try {
-      const societiesData = await societyService.getAllSocieties();
+      let societiesData: SocietyData[];
+      
+      // If user is a society admin, only fetch societies they administer
+      if (user?.role === 'society_admin' && user.id) {
+        societiesData = await societyService.getAdministeredSocieties(user.id);
+      } else {
+        // For system admins and other roles, fetch all societies
+        societiesData = await societyService.getAllSocieties();
+      }
+      
       setSocieties(societiesData);
     } catch (err) {
       console.error('Error fetching societies:', err);
@@ -514,6 +539,7 @@ const ManageResident: React.FC = () => {
                       name="society_id"
                       value={resident.society_id.toString()}
                       label="Society"
+                      disabled={user?.role === 'society_admin'}
                       onChange={(e) => handleChange(e as React.ChangeEvent<HTMLInputElement>)}
                     >
                       {societies.map((society) => (
