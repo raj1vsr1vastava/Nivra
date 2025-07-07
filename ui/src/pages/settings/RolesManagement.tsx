@@ -25,19 +25,34 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { roleService, permissionService } from '../../services';
 
-const RolesManagement = () => {
-  const [roles, setRoles] = useState([]);
-  const [permissions, setPermissions] = useState([]);
-  const [openDialog, setOpenDialog] = useState(false);
-  const [isEditMode, setIsEditMode] = useState(false);
-  const [currentRole, setCurrentRole] = useState({
+// Import types from service files
+import { RoleData } from '../../services/settings/roleService';
+import { PermissionData } from '../../services/settings/permissionService';
+
+// Extended interfaces for component use
+interface Role extends RoleData {
+  created_at?: string;
+  updated_at?: string;
+  permissions?: string[];
+}
+
+interface GroupedPermissions {
+  [resourceType: string]: PermissionData[];
+}
+
+const RolesManagement: React.FC = () => {
+  const [roles, setRoles] = useState<Role[]>([]);
+  const [permissions, setPermissions] = useState<PermissionData[]>([]);
+  const [openDialog, setOpenDialog] = useState<boolean>(false);
+  const [isEditMode, setIsEditMode] = useState<boolean>(false);
+  const [currentRole, setCurrentRole] = useState<Role>({
     name: '',
     description: '',
     permissions: []
   });
   
   // Fetch roles and permissions
-  const fetchRoles = async () => {
+  const fetchRoles = async (): Promise<void> => {
     try {
       const data = await roleService.getAllRoles();
       setRoles(data);
@@ -46,7 +61,7 @@ const RolesManagement = () => {
     }
   };
 
-  const fetchPermissions = async () => {
+  const fetchPermissions = async (): Promise<void> => {
     try {
       const data = await permissionService.getAllPermissions();
       setPermissions(data);
@@ -60,11 +75,11 @@ const RolesManagement = () => {
     fetchPermissions();
   }, []);
 
-  const handleOpenDialog = async (role = null) => {
+  const handleOpenDialog = async (role: Role | null = null): Promise<void> => {
     if (role) {
       // Edit mode - fetch role permissions
       try {
-        const rolePermissions = await roleService.getRolePermissions(role.id);
+        const rolePermissions = await roleService.getRolePermissions(role.id as string);
         const rolePermissionIds = rolePermissions.map(p => p.id);
         setCurrentRole({
           ...role,
@@ -88,40 +103,43 @@ const RolesManagement = () => {
     setOpenDialog(true);
   };
 
-  const handleCloseDialog = () => {
+  const handleCloseDialog = (): void => {
     setOpenDialog(false);
   };
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
     const { name, value } = e.target;
     setCurrentRole({ ...currentRole, [name]: value });
   };
 
-  const handlePermissionChange = (permissionId) => {
-    const updatedPermissions = currentRole.permissions.includes(permissionId)
-      ? currentRole.permissions.filter(id => id !== permissionId)
-      : [...currentRole.permissions, permissionId];
+  const handlePermissionChange = (permissionId: string): void => {
+    const currentPermissions = currentRole.permissions || [];
+    const updatedPermissions = currentPermissions.includes(permissionId)
+      ? currentPermissions.filter(id => id !== permissionId)
+      : [...currentPermissions, permissionId];
     
     setCurrentRole({ ...currentRole, permissions: updatedPermissions });
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (): Promise<void> => {
     try {
-      if (isEditMode) {
+      if (isEditMode && currentRole.id) {
         // Update existing role
         const { permissions, ...roleData } = currentRole;
         await roleService.updateRole(currentRole.id, roleData);
         
         // Update role permissions
-        await roleService.updateRolePermissions(currentRole.id, currentRole.permissions);
+        if (permissions) {
+          await roleService.updateRolePermissions(currentRole.id, permissions);
+        }
       } else {
         // Create new role
         const { permissions, ...roleData } = currentRole;
         const newRole = await roleService.createRole(roleData);
         
         // Add permissions to the new role
-        if (currentRole.permissions.length > 0) {
-          await roleService.updateRolePermissions(newRole.id, currentRole.permissions);
+        if (permissions && permissions.length > 0) {
+          await roleService.updateRolePermissions(newRole.id as string, permissions);
         }
       }
       fetchRoles();
@@ -131,7 +149,7 @@ const RolesManagement = () => {
     }
   };
 
-  const handleDeleteRole = async (roleId) => {
+  const handleDeleteRole = async (roleId: string): Promise<void> => {
     if (window.confirm('Are you sure you want to delete this role?')) {
       try {
         await roleService.deleteRole(roleId);
@@ -143,14 +161,14 @@ const RolesManagement = () => {
   };
 
   // Group permissions by resource_type
-  const groupedPermissions = permissions.reduce((groups, permission) => {
-    const resourceType = permission.resource_type;
+  const groupedPermissions: GroupedPermissions = permissions.reduce((groups, permission) => {
+    const resourceType = permission.resource_type || 'other';
     if (!groups[resourceType]) {
       groups[resourceType] = [];
     }
     groups[resourceType].push(permission);
     return groups;
-  }, {});
+  }, {} as GroupedPermissions);
 
   return (
     <Container maxWidth="lg">
@@ -182,14 +200,14 @@ const RolesManagement = () => {
               <TableRow key={role.id}>
                 <TableCell>{role.name}</TableCell>
                 <TableCell>{role.description}</TableCell>
-                <TableCell>{new Date(role.created_at).toLocaleString()}</TableCell>
-                <TableCell>{new Date(role.updated_at).toLocaleString()}</TableCell>
+                <TableCell>{role.created_at ? new Date(role.created_at).toLocaleString() : ''}</TableCell>
+                <TableCell>{role.updated_at ? new Date(role.updated_at).toLocaleString() : ''}</TableCell>
                 <TableCell>
                   <Stack direction="row" spacing={1}>
                     <IconButton size="small" onClick={() => handleOpenDialog(role)}>
                       <EditIcon fontSize="small" />
                     </IconButton>
-                    <IconButton size="small" onClick={() => handleDeleteRole(role.id)}>
+                    <IconButton size="small" onClick={() => role.id && handleDeleteRole(role.id)}>
                       <DeleteIcon fontSize="small" />
                     </IconButton>
                   </Stack>
@@ -216,7 +234,7 @@ const RolesManagement = () => {
             <TextField
               name="description"
               label="Description"
-              value={currentRole.description}
+              value={currentRole.description || ''}
               onChange={handleInputChange}
               fullWidth
               multiline
@@ -231,12 +249,12 @@ const RolesManagement = () => {
                   {resourceType}
                 </Typography>
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                  {perms.map((permission) => (
+                  {perms.map((permission) => permission.id && (
                     <Chip
                       key={permission.id}
                       label={permission.name}
-                      onClick={() => handlePermissionChange(permission.id)}
-                      color={currentRole.permissions.includes(permission.id) ? "primary" : "default"}
+                      onClick={() => permission.id && handlePermissionChange(permission.id)}
+                      color={permission.id && currentRole.permissions?.includes(permission.id) ? "primary" : "default"}
                       sx={{ mb: 1 }}
                     />
                   ))}

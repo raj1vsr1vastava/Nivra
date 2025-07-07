@@ -14,7 +14,7 @@ import ResidentsList from './pages/residents/ResidentsList';
 import ResidentDetails from './pages/residents/ResidentDetails';
 import ManageResident from './pages/residents/ManageResident';
 import ResidentFinancesList from './pages/finances/ResidentFinancesList';
-import SocietyFinancesList from './pages/expenses/SocietyFinancesList';
+
 import SettingsIndex from './pages/settings/SettingsIndex';
 import UsersManagement from './pages/settings/UsersManagement';
 import RolesManagement from './pages/settings/RolesManagement';
@@ -115,13 +115,7 @@ const App: React.FC = () => {
                 </Layout>
               </ProtectedRoute>
             } />
-            <Route path="/society-finances" element={
-              <ProtectedRoute>
-                <Layout>
-                  <SocietyFinancesList />
-                </Layout>
-              </ProtectedRoute>
-            } />
+
             
             {/* Settings routes */}
             <Route path="/settings" element={

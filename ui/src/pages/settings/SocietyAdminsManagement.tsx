@@ -22,26 +22,32 @@ import {
   Box,
   IconButton,
   FormControlLabel,
-  Switch
+  Switch,
+  SelectChangeEvent
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { societyAdminService, userService, societyService } from '../../services';
+import { SocietyAdminData } from '../../services/settings/societyAdminService';
+import { UserData } from '../../services/settings/userService';
+import { SocietyData } from '../../types';
 
-const SocietyAdminsManagement = () => {
-  const [societyAdmins, setSocietyAdmins] = useState([]);
-  const [users, setUsers] = useState([]);
-  const [societies, setSocieties] = useState([]);
-  const [openDialog, setOpenDialog] = useState(false);
-  const [isEditMode, setIsEditMode] = useState(false);
-  const [currentAdmin, setCurrentAdmin] = useState({
+interface Society extends SocietyData {}
+
+const SocietyAdminsManagement: React.FC = () => {
+  const [societyAdmins, setSocietyAdmins] = useState<SocietyAdminData[]>([]);
+  const [users, setUsers] = useState<UserData[]>([]);
+  const [societies, setSocieties] = useState<Society[]>([]);
+  const [openDialog, setOpenDialog] = useState<boolean>(false);
+  const [isEditMode, setIsEditMode] = useState<boolean>(false);
+  const [currentAdmin, setCurrentAdmin] = useState<SocietyAdminData>({
     user_id: '',
     society_id: '',
     is_primary_admin: false
   });
   
   // Fetch data
-  const fetchSocietyAdmins = async () => {
+  const fetchSocietyAdmins = async (): Promise<void> => {
     try {
       const data = await societyAdminService.getAllSocietyAdmins();
       setSocietyAdmins(data);
@@ -50,7 +56,7 @@ const SocietyAdminsManagement = () => {
     }
   };
 
-  const fetchUsers = async () => {
+  const fetchUsers = async (): Promise<void> => {
     try {
       // Fetch users with society_admin role or system_admin role
       const data = await userService.getAllUsers();
@@ -65,7 +71,7 @@ const SocietyAdminsManagement = () => {
     }
   };
 
-  const fetchSocieties = async () => {
+  const fetchSocieties = async (): Promise<void> => {
     try {
       const data = await societyService.getAllSocieties();
       setSocieties(data);
@@ -80,7 +86,7 @@ const SocietyAdminsManagement = () => {
     fetchSocieties();
   }, []);
 
-  const handleOpenDialog = (admin = null) => {
+  const handleOpenDialog = (admin: SocietyAdminData | null = null): void => {
     if (admin) {
       // Edit mode
       setCurrentAdmin(admin);
@@ -97,22 +103,22 @@ const SocietyAdminsManagement = () => {
     setOpenDialog(true);
   };
 
-  const handleCloseDialog = () => {
+  const handleCloseDialog = (): void => {
     setOpenDialog(false);
   };
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: SelectChangeEvent<string>): void => {
     const { name, value } = e.target;
     setCurrentAdmin({ ...currentAdmin, [name]: value });
   };
 
-  const handleSwitchChange = (e) => {
+  const handleSwitchChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     setCurrentAdmin({ ...currentAdmin, is_primary_admin: e.target.checked });
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (): Promise<void> => {
     try {
-      if (isEditMode) {
+      if (isEditMode && currentAdmin.id) {
         // Update existing society admin
         await societyAdminService.updateSocietyAdmin(currentAdmin.id, currentAdmin);
       } else {
@@ -126,7 +132,7 @@ const SocietyAdminsManagement = () => {
     }
   };
 
-  const handleDeleteAdmin = async (adminId) => {
+  const handleDeleteAdmin = async (adminId: string): Promise<void> => {
     if (window.confirm('Are you sure you want to remove this admin from the society?')) {
       try {
         await societyAdminService.deleteSocietyAdmin(adminId);
@@ -138,8 +144,8 @@ const SocietyAdminsManagement = () => {
   };
 
   // Helper function to find entity by ID
-  const findUserById = (id) => users.find(user => user.id === id);
-  const findSocietyById = (id) => societies.find(society => society.id === id);
+  const findUserById = (id: string): UserData | undefined => users.find(user => user.id === id);
+  const findSocietyById = (id: string | number): Society | undefined => societies.find(society => society.id === id);
 
   return (
     <Container maxWidth="lg">
@@ -176,13 +182,13 @@ const SocietyAdminsManagement = () => {
                   <TableCell>{user ? user.full_name : 'Unknown'}</TableCell>
                   <TableCell>{society ? society.name : 'Unknown'}</TableCell>
                   <TableCell>{admin.is_primary_admin ? 'Yes' : 'No'}</TableCell>
-                  <TableCell>{new Date(admin.created_at).toLocaleString()}</TableCell>
+                  <TableCell>{admin.created_at ? new Date(admin.created_at).toLocaleString() : ''}</TableCell>
                   <TableCell>
                     <Stack direction="row" spacing={1}>
                       <IconButton size="small" onClick={() => handleOpenDialog(admin)}>
                         <EditIcon fontSize="small" />
                       </IconButton>
-                      <IconButton size="small" onClick={() => handleDeleteAdmin(admin.id)}>
+                      <IconButton size="small" onClick={() => admin.id && handleDeleteAdmin(admin.id)}>
                         <DeleteIcon fontSize="small" />
                       </IconButton>
                     </Stack>
@@ -210,7 +216,7 @@ const SocietyAdminsManagement = () => {
                 onChange={handleInputChange}
               >
                 {users.map(user => (
-                  <MenuItem key={user.id} value={user.id}>
+                  <MenuItem key={user.id} value={user.id as string}>
                     {user.full_name} ({user.email})
                   </MenuItem>
                 ))}
@@ -226,7 +232,7 @@ const SocietyAdminsManagement = () => {
                 onChange={handleInputChange}
               >
                 {societies.map(society => (
-                  <MenuItem key={society.id} value={society.id}>
+                  <MenuItem key={society.id} value={society.id.toString()}>
                     {society.name}
                   </MenuItem>
                 ))}
@@ -236,7 +242,7 @@ const SocietyAdminsManagement = () => {
             <FormControlLabel
               control={
                 <Switch
-                  checked={currentAdmin.is_primary_admin}
+                  checked={currentAdmin.is_primary_admin || false}
                   onChange={handleSwitchChange}
                   name="is_primary_admin"
                 />

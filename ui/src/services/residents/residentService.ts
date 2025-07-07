@@ -1,12 +1,13 @@
 import apiClient from '../apiClient';
 
-interface ResidentData {
+export interface ResidentData {
   id: string | number;
   first_name: string;
   last_name: string;
   email?: string;
   phone?: string;
   unit_number?: string;
+  unit?: number | string;
   society_id: string | number;
   society?: {
     id: string | number;
@@ -25,7 +26,7 @@ interface ResidentData {
   notes?: string;
 }
 
-interface ResidentFinancesSummary {
+export interface ResidentFinancesSummary {
   dues: number;
   payments: number;
   balance: number;

@@ -7,7 +7,14 @@ import SecurityIcon from '@mui/icons-material/Security';
 import BusinessIcon from '@mui/icons-material/Business';
 import './SettingsIndex.css';
 
-const SettingsItem = ({ title, description, icon, path }) => {
+interface SettingsItemProps {
+  title: string;
+  description: string;
+  icon: React.ReactNode;
+  path: string;
+}
+
+const SettingsItem: React.FC<SettingsItemProps> = ({ title, description, icon, path }) => {
   const navigate = useNavigate();
   
   return (
@@ -30,8 +37,8 @@ const SettingsItem = ({ title, description, icon, path }) => {
   );
 };
 
-const SettingsIndex = () => {
-  const settingsItems = [
+const SettingsIndex: React.FC = () => {
+  const settingsItems: SettingsItemProps[] = [
     {
       title: 'Users',
       description: 'Manage user accounts and credentials',
@@ -70,13 +77,13 @@ const SettingsIndex = () => {
             <SettingsItem 
               key={index}
               title={item.title}
-            description={item.description}
-            icon={item.icon}
-            path={item.path}
-          />
-        ))}
-      </Grid>
-    </Container>
+              description={item.description}
+              icon={item.icon}
+              path={item.path}
+            />
+          ))}
+        </Grid>
+      </Container>
     </div>
   );
 };

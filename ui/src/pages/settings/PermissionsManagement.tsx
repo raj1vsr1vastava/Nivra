@@ -21,17 +21,19 @@ import {
   MenuItem,
   Stack,
   Box,
-  IconButton
+  IconButton,
+  SelectChangeEvent
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { permissionService } from '../../services';
+import { PermissionData } from '../../services/settings/permissionService';
 
-const PermissionsManagement = () => {
-  const [permissions, setPermissions] = useState([]);
-  const [openDialog, setOpenDialog] = useState(false);
-  const [isEditMode, setIsEditMode] = useState(false);
-  const [currentPermission, setCurrentPermission] = useState({
+const PermissionsManagement: React.FC = () => {
+  const [permissions, setPermissions] = useState<PermissionData[]>([]);
+  const [openDialog, setOpenDialog] = useState<boolean>(false);
+  const [isEditMode, setIsEditMode] = useState<boolean>(false);
+  const [currentPermission, setCurrentPermission] = useState<PermissionData>({
     name: '',
     description: '',
     resource_type: '',
@@ -39,11 +41,11 @@ const PermissionsManagement = () => {
   });
   
   // Resource types and actions
-  const resourceTypes = ['all', 'societies', 'residents', 'users', 'roles', 'finances', 'notices', 'payments', 'public'];
-  const actions = ['read', 'write', 'create', 'update', 'delete', 'manage'];
+  const resourceTypes: string[] = ['all', 'societies', 'residents', 'users', 'roles', 'finances', 'notices', 'payments', 'public'];
+  const actions: string[] = ['read', 'write', 'create', 'update', 'delete', 'manage'];
   
   // Fetch permissions
-  const fetchPermissions = async () => {
+  const fetchPermissions = async (): Promise<void> => {
     try {
       const data = await permissionService.getAllPermissions();
       setPermissions(data);
@@ -56,7 +58,7 @@ const PermissionsManagement = () => {
     fetchPermissions();
   }, []);
 
-  const handleOpenDialog = (permission = null) => {
+  const handleOpenDialog = (permission: PermissionData | null = null): void => {
     if (permission) {
       // Edit mode
       setCurrentPermission(permission);
@@ -74,18 +76,23 @@ const PermissionsManagement = () => {
     setOpenDialog(true);
   };
 
-  const handleCloseDialog = () => {
+  const handleCloseDialog = (): void => {
     setOpenDialog(false);
   };
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
     const { name, value } = e.target;
     setCurrentPermission({ ...currentPermission, [name]: value });
   };
 
-  const handleSubmit = async () => {
+  const handleSelectChange = (e: SelectChangeEvent): void => {
+    const { name, value } = e.target;
+    setCurrentPermission({ ...currentPermission, [name]: value });
+  };
+
+  const handleSubmit = async (): Promise<void> => {
     try {
-      if (isEditMode) {
+      if (isEditMode && currentPermission.id) {
         // Update existing permission
         await permissionService.updatePermission(currentPermission.id, currentPermission);
       } else {
@@ -99,7 +106,7 @@ const PermissionsManagement = () => {
     }
   };
 
-  const handleDeletePermission = async (permissionId) => {
+  const handleDeletePermission = async (permissionId: string): Promise<void> => {
     if (window.confirm('Are you sure you want to delete this permission? This may affect existing roles.')) {
       try {
         await permissionService.deletePermission(permissionId);
@@ -143,13 +150,13 @@ const PermissionsManagement = () => {
                 <TableCell>{permission.description}</TableCell>
                 <TableCell>{permission.resource_type}</TableCell>
                 <TableCell>{permission.action}</TableCell>
-                <TableCell>{new Date(permission.created_at).toLocaleString()}</TableCell>
+                <TableCell>{permission.created_at ? new Date(permission.created_at).toLocaleString() : ''}</TableCell>
                 <TableCell>
                   <Stack direction="row" spacing={1}>
                     <IconButton size="small" onClick={() => handleOpenDialog(permission)}>
                       <EditIcon fontSize="small" />
                     </IconButton>
-                    <IconButton size="small" onClick={() => handleDeletePermission(permission.id)}>
+                    <IconButton size="small" onClick={() => permission.id && handleDeletePermission(permission.id)}>
                       <DeleteIcon fontSize="small" />
                     </IconButton>
                   </Stack>
@@ -177,7 +184,7 @@ const PermissionsManagement = () => {
             <TextField
               name="description"
               label="Description"
-              value={currentPermission.description}
+              value={currentPermission.description || ''}
               onChange={handleInputChange}
               fullWidth
               multiline
@@ -188,9 +195,9 @@ const PermissionsManagement = () => {
               <InputLabel>Resource Type</InputLabel>
               <Select
                 name="resource_type"
-                value={currentPermission.resource_type}
+                value={currentPermission.resource_type || ''}
                 label="Resource Type"
-                onChange={handleInputChange}
+                onChange={handleSelectChange}
               >
                 {resourceTypes.map(type => (
                   <MenuItem key={type} value={type}>
@@ -203,9 +210,9 @@ const PermissionsManagement = () => {
               <InputLabel>Action</InputLabel>
               <Select
                 name="action"
-                value={currentPermission.action}
+                value={currentPermission.action || ''}
                 label="Action"
-                onChange={handleInputChange}
+                onChange={handleSelectChange}
               >
                 {actions.map(action => (
                   <MenuItem key={action} value={action}>

@@ -443,13 +443,7 @@ const SocietyDetails: React.FC = () => {
             View Residents
           </Button>
           
-          <Button 
-            variant="outlined"
-            className="action-button outlined"
-            onClick={() => navigate(`/societies/${society.id}/finances`)}
-          >
-            View Finances
-          </Button>
+
         </Box>
     </Container>
   </div>

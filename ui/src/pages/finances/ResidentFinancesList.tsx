@@ -1,4 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import AddIcon from '@mui/icons-material/Add';
+import SearchIcon from '@mui/icons-material/Search';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import FilterListIcon from '@mui/icons-material/FilterList';
+import '../../styles/shared-headers.css';
+import './ResidentFinancesList.css';
 import { 
   Container, 
   Typography, 
@@ -25,21 +32,19 @@ import {
   SelectChangeEvent
 } from '@mui/material';
 import { financeService, residentService, societyService } from '../../services';
+import { FinanceData as ServiceFinanceData } from '../../services/finances/financeService';
+import { ResidentData as ServiceResidentData } from '../../services/residents/residentService';
 import { 
   SocietyData, 
-  ResidentData, 
   FinanceData, 
   FinanceSummary, 
   SelectOption, 
   StatusColorMap
 } from '../../types';
-import AddIcon from '@mui/icons-material/Add';
-import SearchIcon from '@mui/icons-material/Search';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
-import FilterListIcon from '@mui/icons-material/FilterList';
-import '../../styles/shared-headers.css';
-import './ResidentFinancesList.css';
+
+// ResidentData type with required properties for this component
+type ResidentData = ServiceResidentData;
+
 
 // Helper function to format currency
 const formatCurrency = (amount: number, currency: string = 'INR'): string => {
@@ -113,19 +118,27 @@ const ResidentFinancesList: React.FC = () => {
         
         // Fetch societies
         const societiesData = await societyService.getAllSocieties();
-        setSocieties(societiesData);
+        setSocieties(societiesData as SocietyData[]);
         
         // Fetch finances
         const financesData = await financeService.getAllFinances();
-        setFinances(financesData);
-        setFilteredFinances(financesData);
+        // Convert to component's expected FinanceData format
+        const typedFinancesData = financesData.map(finance => ({
+          ...finance,
+          payment_status: finance.payment_status as 'paid' | 'pending' | 'overdue' | 'partial',
+          transaction_type: finance.transaction_type as 'maintenance' | 'utility' | 'parking' | 'special_charge' | 'late_fee' | 'security_deposit',
+          currency: finance.currency || 'INR'
+        })) as FinanceData[];
+        
+        setFinances(typedFinancesData);
+        setFilteredFinances(typedFinancesData);
         
         // Fetch residents for filtering
         const residentsData = await residentService.getAllResidents();
-        setResidents(residentsData);
+        setResidents(residentsData as ResidentData[]);
         
         // Calculate summary statistics
-        calculateSummary(financesData);
+        calculateSummary(typedFinancesData);
         
         setLoading(false);
       } catch (err) {
@@ -148,14 +161,24 @@ const ResidentFinancesList: React.FC = () => {
     };
     
     financeData.forEach(item => {
-      newSummary.totalAmount += Number(item.amount);
+      const amount = Number(item.amount) || 0;
+      newSummary.totalAmount += amount;
       
-      if (item.payment_status === 'paid') {
-        newSummary.paidAmount += Number(item.amount);
-      } else if (item.payment_status === 'pending') {
-        newSummary.pendingAmount += Number(item.amount);
-      } else if (item.payment_status === 'overdue') {
-        newSummary.overdueAmount += Number(item.amount);
+      switch(item.payment_status) {
+        case 'paid':
+          newSummary.paidAmount += amount;
+          break;
+        case 'pending':
+          newSummary.pendingAmount += amount;
+          break;
+        case 'overdue':
+          newSummary.overdueAmount += amount;
+          break;
+        case 'partial':
+          // For partial payments, we could add partial logic here if needed
+          // For now, just include them in pending amount
+          newSummary.pendingAmount += amount;
+          break;
       }
     });
     
