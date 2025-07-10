@@ -5,6 +5,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
 import SocietyAdminRedirect from './components/SocietyAdminRedirect';
+import ResidentRedirect from './components/ResidentRedirect';
 import Login from './pages/login/Login';
 import SocietySelection from './pages/society-selection/SocietySelection';
 import PendingApproval from './pages/pending-approval/PendingApproval';
@@ -50,7 +51,9 @@ const App: React.FC = () => {
               <ProtectedRoute>
                 <Layout>
                   <SocietyAdminRedirect>
-                    <SocietiesList />
+                    <ResidentRedirect>
+                      <SocietiesList />
+                    </ResidentRedirect>
                   </SocietyAdminRedirect>
                 </Layout>
               </ProtectedRoute>
@@ -86,7 +89,9 @@ const App: React.FC = () => {
             <Route path="/residents" element={
               <ProtectedRoute>
                 <Layout>
-                  <ResidentsList />
+                  <ResidentRedirect>
+                    <ResidentsList />
+                  </ResidentRedirect>
                 </Layout>
               </ProtectedRoute>
             } />

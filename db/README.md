@@ -1,6 +1,13 @@
 # Nivra Database
 
-This directory contains the database setup scripts for the Nivra application.
+This directory contains the database setup scripts for the Nivra Society Management System.
+
+## Files Overview
+
+- `complete_schema.sql` - Complete database schema with all tables, indexes, triggers, and views (schema only, no data)
+- `insert_data.sql` - Sample data for testing and development
+- `reset_database.sql` - Utility script to reset the database
+- `README.md` - This documentation file
 
 ## Database Structure
 
@@ -10,145 +17,203 @@ The database consists of the following tables:
 - `societies`: Store information about housing societies
 - `residents`: Store information about residents living in the societies
 - `resident_finances`: Store financial transactions related to residents
+- `society_finances`: Store society-level income and expenses with categorization
 
 ### Role-Based Access Control (RBAC) Tables
-- `roles`: Defines user roles (system_admin, society_admin, committee_member, resident)
+- `roles`: Defines user roles (system_admin, society_admin, committee_member, resident, pending_user)
 - `users`: User accounts with authentication information
 - `permissions`: Available permissions in the system
 - `role_permissions`: Mapping of permissions to roles
 - `society_admins`: Mapping of admin users to societies they manage
 
-## Setup Instructions
+### Society Join Request Workflow
+- `society_join_requests`: Handles user requests to join societies
+- `society_join_requests_with_details`: View for easy querying with user and society details
+
+## Quick Setup
 
 ### Prerequisites
 - PostgreSQL installed on your system
 - PostgreSQL command-line tools (psql)
 
-### Creating the Database
+### One-Step Database Setup
 
-1. Connect to PostgreSQL as a user with create database privileges (usually postgres):
+1. **Create database schema:**
+   ```bash
+   psql -d postgres -f complete_schema.sql
    ```
+
+2. **Add initial and sample data:**
+   ```bash
+   psql -d nivra -f insert_data.sql
+   ```
+
+### Manual Setup (Alternative)
+
+If you prefer step-by-step setup:
+
+1. **Connect to PostgreSQL:**
+   ```bash
    psql -U postgres
    ```
 
-2. Run the create database script:
-   ```
-   psql -U postgres -f create_database.sql
-   ```
-
-3. Create the tables:
-   ```
-   psql -U postgres -f create_tables.sql
+2. **Create database manually:**
+   ```sql
+   CREATE DATABASE nivra;
+   \c nivra;
+   CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
    ```
 
-4. (Optional) Load sample data:
-   ```
-   psql -U postgres -f sample_data.sql
-   ```
-
-5. (Optional) Load RBAC sample data:
-   ```
-   psql -U postgres -f rbac_sample_data.sql
+3. **Run the schema file:**
+   ```bash
+   psql -d nivra -f complete_schema.sql
    ```
 
-### Reset Database
+## Reset Database
 
-If you need to reset the database during development:
-```
-psql -U postgres -f reset_database.sql
+To completely reset the database and start fresh:
+
+```bash
+psql -d postgres -f reset_database.sql
+psql -d postgres -f complete_schema.sql
+psql -d nivra -f insert_data.sql
 ```
 
-Then follow the steps above to recreate the database and tables.
+## Default Login Credentials
 
-## Database Schema
+After setup, you can login with:
 
-### Societies Table
-- `id`: UUID (Primary Key)
-- `name`: Society name
-- `address`: Complete address
-- `city`: City name
-- `state`: State/province name
-- `zipcode`: Postal code
-- `country`: Country name (default: India)
-- `contact_email`: Contact email address
-- `contact_phone`: Contact phone number
-- `registration_number`: Society registration number
-- `registration_date`: Date of registration
-- `total_units`: Total number of housing units
-- `created_at`: Timestamp of record creation
-- `updated_at`: Timestamp of last update
+- **System Admin:**
+  - Username: `admin`
+  - Password: `changeme123`
 
-### Residents Table
-- `id`: UUID (Primary Key)
-- `society_id`: Reference to societies table
-- `first_name`: Resident's first name
-- `last_name`: Resident's last name
-- `email`: Resident's email (unique)
-- `phone`: Resident's phone number
-- `unit_number`: Apartment/unit number
-- `is_owner`: Whether the resident owns the unit
-- `is_committee_member`: Whether the resident is part of management committee
-- `committee_role`: Role in the committee (if applicable)
-- `move_in_date`: Date moved in
-- `move_out_date`: Date moved out (if applicable)
-- `created_at`: Timestamp of record creation
-- `updated_at`: Timestamp of last update
+- **Society Admins (if sample data loaded):**
+  - Green Valley: Username `gv_admin`, Password `changeme123`
+  - Sunrise Towers: Username `st_admin`, Password `changeme123`
+  - Metro Heights: Username `mh_admin`, Password `changeme123`
 
-### Resident Finances Table
-- `id`: UUID (Primary Key)
-- `resident_id`: Reference to residents table
-- `transaction_type`: Type of financial transaction
-- `amount`: Amount of the transaction
-- `currency`: Currency code (default: INR)
-- `due_date`: Date payment is due
-- `payment_date`: Date payment was made
-- `payment_method`: Method of payment
-- `payment_status`: Status of payment (pending, paid, overdue)
-- `description`: Description of the transaction
-- `invoice_number`: Invoice reference number
-- `receipt_number`: Receipt reference number
-- `created_at`: Timestamp of record creation
-- `updated_at`: Timestamp of last update
+⚠️ **Important:** Change all default passwords after first login!
 
-### Soft Delete Implementation
+## Features
 
-All primary tables include an `is_active` boolean flag (default TRUE). When a record needs to be "deleted", it should be marked as inactive (is_active = FALSE) rather than actually removed from the database. This allows for data recovery and maintains referential integrity.
+### Role-Based Access Control
+- **System Admin:** Full access to all societies and features
+- **Society Admin:** Access to specific societies they administer
+- **Committee Member:** Read/write access with no delete permissions
+- **Resident:** Read-only access to society information
+- **Pending User:** Limited access until approved for a society
 
-### Role-Based Access Control System
+### Society Join Requests
+- Users can request to join societies
+- Admins can approve/reject requests
+- Support for both user requests and admin invitations
 
-The RBAC system is designed to control access to different parts of the application based on user roles:
+### Financial Management
+- Resident-level financial tracking
+- Society-level income and expense tracking
+- Categorized transactions (income vs expenses)
+- Payment status tracking
 
-1. **System Admin (Nivra Admin):**
-   - Has full access to all societies and features
-   - Can perform all CRUD operations on any data
+### Multi-Society Support
+- System supports multiple societies
+- Role-based filtering ensures users only see relevant data
+- Society admins manage only their assigned societies
 
-2. **Society Admin:**
-   - Has full CRUD access but only for their assigned societies
-   - Can manage residents and finances within their society
+## Database Schema Details
 
-3. **Committee Member:**
-   - Can read, create, and update data but cannot delete
-   - Limited to their own society
+### Core Tables Structure
 
-4. **Resident:**
-   - Read-only access to society information
-   - Can view their own financial records
-   - Cannot modify data except their own profile
+```
+societies
+├── id (UUID, primary key)
+├── name, address, city, state, zipcode, country
+├── contact_email, contact_phone
+├── registration_number, registration_date
+├── total_units, is_active
+└── created_at, updated_at
 
-### Permission Structure
+residents
+├── id (UUID, primary key)
+├── society_id (foreign key)
+├── first_name, last_name, email, phone
+├── unit_number, is_owner
+├── is_committee_member, committee_role
+├── move_in_date, move_out_date, is_active
+└── created_at, updated_at
 
-Permissions are structured as:
-- `resource_type`: The type of resource (societies, residents, finances)
-- `action`: The allowed action (create, read, update, delete)
+resident_finances
+├── id (UUID, primary key)
+├── resident_id (foreign key)
+├── transaction_type, amount, currency
+├── due_date, payment_date, payment_method
+├── payment_status, description
+├── invoice_number, receipt_number, is_active
+└── created_at, updated_at
 
-For example, a committee member has permission `committee_society_update` which allows them to update society details but not delete them.
+society_finances
+├── id (UUID, primary key)
+├── society_id (foreign key)
+├── expense_type, category, vendor_name
+├── expense_date, amount, currency
+├── payment_status, payment_date, payment_method
+├── invoice_number, receipt_number, description
+├── recurring, recurring_frequency, next_due_date
+├── transaction_category (income/expense), is_active
+└── created_at, updated_at
+```
 
-### Default Users
+### RBAC Tables Structure
 
-The sample data includes the following default users:
-- System Admin: username `admin` / password `changeme123`
-- Society Admin: username `societyadmin` / password `changeme123`
-- Committee Member: username `committee1` / password `changeme123`
-- Regular Resident: username `resident1` / password `changeme123`
+```
+roles
+├── id (UUID, primary key)
+├── name (unique), description
+└── created_at, updated_at
 
-**Important:** Change these passwords in production.
+users
+├── id (UUID, primary key)
+├── username (unique), password_hash
+├── email (unique), full_name
+├── role_id (foreign key)
+├── resident_id (foreign key, optional)
+├── user_status, is_active, last_login
+└── created_at, updated_at
+
+permissions
+├── id (UUID, primary key)
+├── name (unique), description
+├── resource_type, action
+└── created_at, updated_at
+
+society_admins
+├── id (UUID, primary key)
+├── user_id (foreign key)
+├── society_id (foreign key)
+├── is_primary_admin
+└── created_at, updated_at
+```
+
+## Permission Structure
+
+Permissions follow the pattern: `{scope}_{resource}_{action}`
+
+- **Scope:** `all` (system-wide), `society` (society-specific), `committee`, `resident`
+- **Resource:** `societies`, `residents`, `finances`, `join_requests`
+- **Action:** `create`, `read`, `update`, `delete`, `approve`, `reject`, `cancel`
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Permission denied errors:**
+   - Ensure you're running as a PostgreSQL superuser or user with database creation privileges
+
+2. **Extension not found:**
+   - Make sure PostgreSQL contrib package is installed: `postgresql-contrib`
+
+3. **Database already exists:**
+   - Use the reset script or manually drop the database first
+
+### Support
+
+For issues or questions, please refer to the main application documentation or contact the development team.

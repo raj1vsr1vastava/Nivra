@@ -122,7 +122,7 @@ const ResidentFinancesList: React.FC = () => {
         let societiesData: SocietyData[];
         
         // If user is a society admin, only fetch societies they administer
-        if (user?.role === 'society_admin' && user.id) {
+        if (user?.role === 'Society Admin' && user.id) {
           societiesData = await societyService.getAdministeredSocieties(user.id);
         } else {
           // For system admins and other roles, fetch all societies
@@ -132,7 +132,7 @@ const ResidentFinancesList: React.FC = () => {
         setSocieties(societiesData);
         
         // For society admins, automatically set the society filter to their administered society
-        if (user?.role === 'society_admin' && societiesData.length > 0) {
+        if (user?.role === 'Society Admin' && societiesData.length > 0) {
           setSocietyFilter(String(societiesData[0].id));
         }
         
@@ -407,7 +407,7 @@ const ResidentFinancesList: React.FC = () => {
             </Typography>
           </Box>
           <div className="filters-grid">
-            {user?.role !== 'society_admin' && (
+            {user?.role !== 'Society Admin' && (
               <div className="filter-item">
                 <FormControl fullWidth size="small">
                   <InputLabel id="society-filter-label">Society</InputLabel>
@@ -438,7 +438,7 @@ const ResidentFinancesList: React.FC = () => {
                   value={residentFilter}
                   label="Resident"
                   onChange={handleResidentFilterChange}
-                  disabled={!societyFilter && user?.role !== 'society_admin'}
+                  disabled={!societyFilter && user?.role !== 'Society Admin'}
                 >
                   <MenuItem value="">All Residents</MenuItem>
                   {residents

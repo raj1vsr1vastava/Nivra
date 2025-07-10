@@ -15,7 +15,7 @@ const SocietyAdminRedirect: React.FC<SocietyAdminRedirectProps> = ({ children })
 
   useEffect(() => {
     const handleRedirect = async () => {
-      if (user?.role === 'society_admin' && user.id) {
+      if (user?.role === 'Society Admin' && user.id) {
         try {
           // Fetch the societies administered by this user
           const administeredSocieties = await societyService.getAdministeredSocieties(user.id);
@@ -35,7 +35,7 @@ const SocietyAdminRedirect: React.FC<SocietyAdminRedirectProps> = ({ children })
     handleRedirect();
   }, [user, navigate]);
 
-  if (loading && user?.role === 'society_admin') {
+  if (loading && user?.role === 'Society Admin') {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
         <CircularProgress />

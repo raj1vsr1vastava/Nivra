@@ -50,7 +50,7 @@ const SocietiesList: React.FC = () => {
       let data: SocietyData[];
       
       // If user is a society admin, only fetch societies they administer
-      if (user?.role === 'society_admin' && user.id) {
+      if (user?.role === 'Society Admin' && user.id) {
         data = await societyService.getAdministeredSocieties(user.id);
       } else {
         // For system admins and other roles, fetch all societies

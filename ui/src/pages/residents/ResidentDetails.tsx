@@ -10,6 +10,7 @@ import {
 } from '@mui/material';
 import CardDetails from '../../components/CardDetails';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 import residentService from '../../services/residents/residentService';
 import EditIcon from '@mui/icons-material/Edit';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -75,11 +76,54 @@ const ResidentDetails: React.FC = () => {
   const residentId = params.residentId;
   const navigate = useNavigate();
   const location = useLocation();
+  const { user } = useAuth();
   const forceUpdate = location.state && (location.state as {updated?: boolean}).updated;
   const [resident, setResident] = useState<Resident | null>(null);
   const [financesSummary, setFinancesSummary] = useState<ResidentFinancesSummary | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Check if current user can edit this resident
+  const canEdit = (): boolean => {
+    if (!user) return false;
+    
+    // Super User and Society Admin can edit any resident
+    if (user.role === 'Super User' || user.role === 'Society Admin') {
+      return true;
+    }
+    
+    // Committee Members can edit residents in their society (if implemented)
+    if (user.role === 'Committee Member') {
+      return true; // For now, allow committee members to edit
+    }
+    
+    // Residents cannot edit any resident details (including their own)
+    return false;
+  };
+
+  // Check if current user can view financial details
+  const canViewFinances = (): boolean => {
+    if (!user) return false;
+    
+    // All roles can view finances (read-only for residents)
+    return true;
+  };
+
+  const handleBackNavigation = () => {
+    // Residents should go to residents list of their society, others go to general residents list
+    if (user?.role === 'Resident') {
+      if (resident?.society_id) {
+        navigate(`/societies/${resident.society_id}/residents`);
+      } else if (user.societyId) {
+        navigate(`/societies/${user.societyId}/residents`);
+      } else {
+        // Fallback to general residents list
+        navigate('/residents');
+      }
+    } else {
+      navigate('/residents');
+    }
+  };
 
   useEffect(() => {
     if (residentId) {
@@ -158,7 +202,7 @@ const ResidentDetails: React.FC = () => {
             {error}
           </Alert>
           <IconButton 
-            onClick={() => navigate('/residents')}
+            onClick={handleBackNavigation}
             className="back-button-header"
           >
             <ArrowBackIcon />
@@ -184,7 +228,7 @@ const ResidentDetails: React.FC = () => {
             Resident not found
           </Alert>
           <IconButton 
-            onClick={() => navigate('/residents')}
+            onClick={handleBackNavigation}
             className="back-button-header"
           >
             <ArrowBackIcon />
@@ -198,7 +242,7 @@ const ResidentDetails: React.FC = () => {
     ? new Date(resident.move_in_date).toLocaleDateString() 
     : 'Not Available';
 
-  const leaseEndDate = resident.move_out_date
+  const leaveEndDate = resident.move_out_date
     ? new Date(resident.move_out_date).toLocaleDateString()
     : 'Not Available';
 
@@ -208,7 +252,7 @@ const ResidentDetails: React.FC = () => {
         <div className="page-header">
           <div className="page-title-section">
             <IconButton 
-              onClick={() => navigate('/residents')}
+              onClick={handleBackNavigation}
               className="page-back-button"
             >
               <ArrowBackIcon />
@@ -217,19 +261,21 @@ const ResidentDetails: React.FC = () => {
               {resident.name}
             </h1>
           </div>
-          <Button 
-            variant="contained"
-            color="primary" 
-            startIcon={<EditIcon />}
-            sx={{ 
-              height: '40px',
-              width: { xs: '100%', md: 'auto' },
-              ml: { xs: 0, md: 1 }
-            }}
-            onClick={() => navigate(`/residents/${resident.id}/edit`)}
-          >
-            Edit
-          </Button>
+          {canEdit() && (
+            <Button 
+              variant="contained"
+              color="primary" 
+              startIcon={<EditIcon />}
+              sx={{ 
+                height: '40px',
+                width: { xs: '100%', md: 'auto' },
+                ml: { xs: 0, md: 1 }
+              }}
+              onClick={() => navigate(`/residents/${resident.id}/edit`)}
+            >
+              Edit
+            </Button>
+          )}
         </div>
 
         {/* Resident Information Card - Row 1 */}
@@ -287,7 +333,7 @@ const ResidentDetails: React.FC = () => {
             ...(resident.move_out_date && !resident.is_owner ? [{
               icon: <CalendarMonthIcon />,
               label: "Lease End Date",
-              value: leaseEndDate,
+              value: leaveEndDate,
               iconColor: 'var(--warning)'
             }] : [])
           ]}
@@ -296,10 +342,15 @@ const ResidentDetails: React.FC = () => {
         />
 
         {/* Financial Summary - Row 2 */}
-        {financesSummary && (
+        {financesSummary && canViewFinances() && (
           <Box sx={{ mt: 4 }}>
             <Typography variant="h5" gutterBottom sx={{ color: 'var(--primary-color)', fontWeight: 600 }}>
               Financial Summary
+              {user?.role === 'Resident' && (
+                <Typography variant="body2" sx={{ color: 'var(--text-secondary)', fontStyle: 'italic', fontWeight: 400 }}>
+                  (Read-only)
+                </Typography>
+              )}
             </Typography>
             <Grid container spacing={2} sx={{ mb: 2 }}>
               <Grid item xs={12} sm={4}>
@@ -364,17 +415,19 @@ const ResidentDetails: React.FC = () => {
         )}
 
         <Box sx={{ mt: 4, display: 'flex', gap: 2 }}>
-          <Button 
-            variant="contained"
-            color="primary"
-            sx={{ 
-              height: '40px',
-              width: { xs: '100%', md: 'auto' }
-            }}
-            onClick={() => navigate(`/residents/${resident.id}/transactions`)}
-          >
-            View All Transactions
-          </Button>
+          {user?.role !== 'Resident' && (
+            <Button 
+              variant="contained"
+              color="primary"
+              sx={{ 
+                height: '40px',
+                width: { xs: '100%', md: 'auto' }
+              }}
+              onClick={() => navigate(`/residents/${resident.id}/transactions`)}
+            >
+              View All Transactions
+            </Button>
+          )}
           
           <Button 
             variant="outlined"

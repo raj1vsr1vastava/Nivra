@@ -71,7 +71,7 @@ const ResidentsList: React.FC = () => {
         let data: SocietyData[];
         
         // If user is a society admin, only fetch societies they administer
-        if (user?.role === 'society_admin' && user.id) {
+        if (user?.role === 'Society Admin' && user.id) {
           data = await societyService.getAdministeredSocieties(user.id);
         } else {
           // For system admins and other roles, fetch all societies
@@ -110,14 +110,17 @@ const ResidentsList: React.FC = () => {
       setLoading(true);
       let data: Resident[];
       
-      // If societyId is provided from route params, filter by that society
-      if (societyId) {
+      // If user is a Resident, only show residents from their own society
+      if (user?.role === 'Resident' && user.societyId) {
+        data = await residentService.getSocietyResidents(user.societyId);
+      } else if (societyId) {
+        // If societyId is provided from route params, filter by that society
         data = await residentService.getSocietyResidents(societyId);
       } else if (selectedSociety) {
         // Fetch residents for specific society from dropdown filter
         data = await residentService.getSocietyResidents(selectedSociety);
       } else {
-        // Fetch all residents
+        // Fetch all residents (only for admin roles)
         data = await residentService.getAllResidents();
       }
       
@@ -151,6 +154,19 @@ const ResidentsList: React.FC = () => {
       navigate('/residents/add');
     }
   };
+
+  // Check if current user can manage residents
+  const canManageResidents = (): boolean => {
+    if (!user) return false;
+    
+    // Residents cannot manage residents
+    if (user.role === 'Resident') {
+      return false;
+    }
+    
+    // All other roles can manage residents
+    return true;
+  };
   
   return (
     <div className="residents-container">
@@ -166,7 +182,8 @@ const ResidentsList: React.FC = () => {
               </IconButton>
             )}
             <h1 className="page-header-title">
-              {currentSociety ? `${currentSociety.name} Residents` : 'Residents'}
+              {currentSociety ? `${currentSociety.name} Residents` : 
+               user?.role === 'Resident' ? 'My Society Residents' : 'Residents'}
             </h1>
           </div>
           <Box className="page-header-controls">
@@ -184,7 +201,7 @@ const ResidentsList: React.FC = () => {
                 size="small"
               />
             </Box>
-            {!societyId && user?.role !== 'society_admin' && (
+            {!societyId && user?.role !== 'Society Admin' && (
               <Box className="page-filter-container">
                 <FormControl fullWidth size="small" className="residents-form-control">
                   <InputLabel id="society-select-label">Filter by Society</InputLabel>
@@ -205,15 +222,17 @@ const ResidentsList: React.FC = () => {
                 </FormControl>
               </Box>
             )}
-            <Button 
-              variant="contained" 
-              color="primary" 
-              startIcon={<AddIcon />}
-              onClick={handleAddResident}
-              className="page-add-button"
-            >
-              Add Resident
-            </Button>
+            {canManageResidents() && (
+              <Button 
+                variant="contained" 
+                color="primary" 
+                startIcon={<AddIcon />}
+                onClick={handleAddResident}
+                className="page-add-button"
+              >
+                Add Resident
+              </Button>
+            )}
           </Box>
         </div>
 

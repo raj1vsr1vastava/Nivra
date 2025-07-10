@@ -63,6 +63,25 @@ def get_resident(resident_id: UUID, db: Session = Depends(get_db)):
     return resident
 
 
+@router.get("/users/{user_id}/resident", response_model=schemas.Resident)
+def get_resident_by_user_id(user_id: UUID, db: Session = Depends(get_db)):
+    """
+    Get resident information for a specific user.
+    """
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    if user.resident_id is None:
+        raise HTTPException(status_code=404, detail="User is not associated with a resident")
+    
+    resident = db.query(models.Resident).options(joinedload(models.Resident.society)).filter(models.Resident.id == user.resident_id).first()
+    if resident is None:
+        raise HTTPException(status_code=404, detail="Resident not found")
+    
+    return resident
+
+
 @router.post("/residents/", response_model=schemas.Resident, status_code=201)
 def create_resident(resident: schemas.ResidentCreate, db: Session = Depends(get_db)):
     """

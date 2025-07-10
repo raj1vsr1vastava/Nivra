@@ -22,34 +22,26 @@ import {
   Box,
   IconButton,
   FormControlLabel,
-  Switch,
-  SelectChangeEvent
+  Switch
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { societyAdminService, userService, societyService } from '../../services';
-import { SocietyAdminData } from '../../services/settings/societyAdminService';
-import { UserData } from '../../services/settings/userService';
-import { useAuth } from '../../contexts/AuthContext';
-import { SocietyData } from '../../types';
 
-interface Society extends SocietyData {}
-
-const SocietyAdminsManagement: React.FC = () => {
-  const { user } = useAuth();
-  const [societyAdmins, setSocietyAdmins] = useState<SocietyAdminData[]>([]);
-  const [users, setUsers] = useState<UserData[]>([]);
-  const [societies, setSocieties] = useState<Society[]>([]);
-  const [openDialog, setOpenDialog] = useState<boolean>(false);
-  const [isEditMode, setIsEditMode] = useState<boolean>(false);
-  const [currentAdmin, setCurrentAdmin] = useState<SocietyAdminData>({
+const SocietyAdminsManagement = () => {
+  const [societyAdmins, setSocietyAdmins] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [societies, setSocieties] = useState([]);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [currentAdmin, setCurrentAdmin] = useState({
     user_id: '',
     society_id: '',
     is_primary_admin: false
   });
   
   // Fetch data
-  const fetchSocietyAdmins = async (): Promise<void> => {
+  const fetchSocietyAdmins = async () => {
     try {
       const data = await societyAdminService.getAllSocietyAdmins();
       setSocietyAdmins(data);
@@ -58,7 +50,7 @@ const SocietyAdminsManagement: React.FC = () => {
     }
   };
 
-  const fetchUsers = async (): Promise<void> => {
+  const fetchUsers = async () => {
     try {
       // Fetch users with Society Admin role or Super User role
       const data = await userService.getAllUsers();
@@ -73,10 +65,8 @@ const SocietyAdminsManagement: React.FC = () => {
     }
   };
 
-  const fetchSocieties = async (): Promise<void> => {
+  const fetchSocieties = async () => {
     try {
-      // Always fetch all societies for the dropdown and lookup, regardless of user role
-      // This ensures society names are correctly displayed even for admins created by system admins
       const data = await societyService.getAllSocieties();
       setSocieties(data);
     } catch (error) {
@@ -84,37 +74,19 @@ const SocietyAdminsManagement: React.FC = () => {
     }
   };
 
-  // Get societies available for selection in the dropdown (filtered for society admins)
-  const getAvailableSocieties = (): Society[] => {
-    if (user?.role === 'Society Admin' && user.id) {
-      // For society admins, only show societies they administer in the dropdown
-      // We'll need to fetch this separately or filter from the existing data
-      // For now, return all societies - this may need refinement based on backend support
-      return societies;
-    }
-    return societies;
-  };
-
   useEffect(() => {
     fetchSocietyAdmins();
     fetchUsers();
     fetchSocieties();
-  }, [user]);
+  }, []);
 
-  const handleOpenDialog = (admin: SocietyAdminData | null = null): void => {
+  const handleOpenDialog = (admin = null) => {
     if (admin) {
-      // Edit mode - ensure all values are properly set
-      console.log('Editing admin:', admin);
-      setCurrentAdmin({
-        ...admin,
-        user_id: admin.user_id || '',
-        society_id: admin.society_id || '',
-        is_primary_admin: admin.is_primary_admin || false
-      });
+      // Edit mode
+      setCurrentAdmin(admin);
       setIsEditMode(true);
     } else {
       // Create mode
-      console.log('Creating new admin');
       setCurrentAdmin({
         user_id: '',
         society_id: '',
@@ -125,55 +97,36 @@ const SocietyAdminsManagement: React.FC = () => {
     setOpenDialog(true);
   };
 
-  const handleCloseDialog = (): void => {
+  const handleCloseDialog = () => {
     setOpenDialog(false);
-    // Reset the form state
-    setCurrentAdmin({
-      user_id: '',
-      society_id: '',
-      is_primary_admin: false
-    });
-    setIsEditMode(false);
   };
 
-  const handleInputChange = (e: SelectChangeEvent<string>): void => {
+  const handleInputChange = (e) => {
     const { name, value } = e.target;
-    console.log('Input changed:', name, '=', value);
-    setCurrentAdmin(prev => {
-      const updated = { ...prev, [name as string]: value };
-      console.log('Updated admin state:', updated);
-      return updated;
-    });
+    setCurrentAdmin({ ...currentAdmin, [name]: value });
   };
 
-  const handleSwitchChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
-    setCurrentAdmin(prev => ({ ...prev, is_primary_admin: e.target.checked }));
+  const handleSwitchChange = (e) => {
+    setCurrentAdmin({ ...currentAdmin, is_primary_admin: e.target.checked });
   };
 
-  const handleSubmit = async (): Promise<void> => {
+  const handleSubmit = async () => {
     try {
-      if (isEditMode && currentAdmin.id) {
+      if (isEditMode) {
         // Update existing society admin
-        const updatedAdmin = await societyAdminService.updateSocietyAdmin(currentAdmin.id, currentAdmin);
-        console.log('Updated admin:', updatedAdmin);
+        await societyAdminService.updateSocietyAdmin(currentAdmin.id, currentAdmin);
       } else {
         // Create new society admin
-        const newAdmin = await societyAdminService.createSocietyAdmin(currentAdmin);
-        console.log('Created admin:', newAdmin);
+        await societyAdminService.createSocietyAdmin(currentAdmin);
       }
-      
-      // Close dialog first
+      fetchSocietyAdmins();
       handleCloseDialog();
-      
-      // Then refresh the data
-      await fetchSocietyAdmins();
     } catch (error) {
       console.error('Error saving society admin:', error);
-      // Keep dialog open on error so user can retry
     }
   };
 
-  const handleDeleteAdmin = async (adminId: string): Promise<void> => {
+  const handleDeleteAdmin = async (adminId) => {
     if (window.confirm('Are you sure you want to remove this admin from the society?')) {
       try {
         await societyAdminService.deleteSocietyAdmin(adminId);
@@ -185,8 +138,8 @@ const SocietyAdminsManagement: React.FC = () => {
   };
 
   // Helper function to find entity by ID
-  const findUserById = (id: string): UserData | undefined => users.find(user => user.id === id);
-  const findSocietyById = (id: string | number): Society | undefined => societies.find(society => society.id === id);
+  const findUserById = (id) => users.find(user => user.id === id);
+  const findSocietyById = (id) => societies.find(society => society.id === id);
 
   return (
     <Container maxWidth="lg">
@@ -218,22 +171,18 @@ const SocietyAdminsManagement: React.FC = () => {
               const user = findUserById(admin.user_id);
               const society = findSocietyById(admin.society_id);
               
-              // Check if this is a super user (system admin) - they might have no society_id or special society_id
-              const userRole = user?.role || '';
-              const societyDisplay = userRole === 'Super User' ? 'All' : (society ? society.name : 'Unknown');
-              
               return (
                 <TableRow key={admin.id}>
                   <TableCell>{user ? user.full_name : 'Unknown'}</TableCell>
-                  <TableCell>{societyDisplay}</TableCell>
+                  <TableCell>{society ? society.name : 'Unknown'}</TableCell>
                   <TableCell>{admin.is_primary_admin ? 'Yes' : 'No'}</TableCell>
-                  <TableCell>{admin.created_at ? new Date(admin.created_at).toLocaleString() : ''}</TableCell>
+                  <TableCell>{new Date(admin.created_at).toLocaleString()}</TableCell>
                   <TableCell>
                     <Stack direction="row" spacing={1}>
                       <IconButton size="small" onClick={() => handleOpenDialog(admin)}>
                         <EditIcon fontSize="small" />
                       </IconButton>
-                      <IconButton size="small" onClick={() => admin.id && handleDeleteAdmin(admin.id)}>
+                      <IconButton size="small" onClick={() => handleDeleteAdmin(admin.id)}>
                         <DeleteIcon fontSize="small" />
                       </IconButton>
                     </Stack>
@@ -256,12 +205,12 @@ const SocietyAdminsManagement: React.FC = () => {
               <InputLabel>User</InputLabel>
               <Select
                 name="user_id"
-                value={currentAdmin.user_id || ''}
+                value={currentAdmin.user_id}
                 label="User"
                 onChange={handleInputChange}
               >
                 {users.map(user => (
-                  <MenuItem key={user.id} value={user.id as string}>
+                  <MenuItem key={user.id} value={user.id}>
                     {user.full_name} ({user.email})
                   </MenuItem>
                 ))}
@@ -272,12 +221,12 @@ const SocietyAdminsManagement: React.FC = () => {
               <InputLabel>Society</InputLabel>
               <Select
                 name="society_id"
-                value={currentAdmin.society_id || ''}
+                value={currentAdmin.society_id}
                 label="Society"
                 onChange={handleInputChange}
               >
-                {getAvailableSocieties().map(society => (
-                  <MenuItem key={society.id} value={society.id.toString()}>
+                {societies.map(society => (
+                  <MenuItem key={society.id} value={society.id}>
                     {society.name}
                   </MenuItem>
                 ))}
@@ -287,7 +236,7 @@ const SocietyAdminsManagement: React.FC = () => {
             <FormControlLabel
               control={
                 <Switch
-                  checked={currentAdmin.is_primary_admin || false}
+                  checked={currentAdmin.is_primary_admin}
                   onChange={handleSwitchChange}
                   name="is_primary_admin"
                 />

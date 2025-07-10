@@ -146,7 +146,7 @@ const SocietyDetails: React.FC = () => {
           >
             {error}
           </Alert>
-          {user?.role !== 'society_admin' && (
+          {user?.role !== 'Society Admin' && (
             <IconButton 
               onClick={() => navigate('/societies')}
               className="back-button-header"
@@ -169,7 +169,7 @@ const SocietyDetails: React.FC = () => {
           >
             Society not found
           </Alert>
-          {user?.role !== 'society_admin' && (
+          {user?.role !== 'Society Admin' && (
             <IconButton 
               onClick={() => navigate('/societies')}
               className="back-button-header"
@@ -191,7 +191,7 @@ const SocietyDetails: React.FC = () => {
       <Container maxWidth="xl" className="no-padding">
         <div className="page-header">
           <div className="page-title-section">
-            {user?.role !== 'society_admin' && (
+            {user?.role !== 'Society Admin' && (
               <IconButton 
                 onClick={() => navigate('/societies')}
                 className="page-back-button"

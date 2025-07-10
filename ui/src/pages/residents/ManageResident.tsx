@@ -106,7 +106,7 @@ const ManageResident: React.FC = () => {
     let defaultSocietyId = societyId || '';
     
     // For society admins, set the default society to their administered society
-    if (user?.role === 'society_admin' && user.id && !defaultSocietyId) {
+    if (user?.role === 'Society Admin' && user.id && !defaultSocietyId) {
       try {
         const administeredSocieties = await societyService.getAdministeredSocieties(user.id);
         if (administeredSocieties.length > 0) {
@@ -146,7 +146,7 @@ const ManageResident: React.FC = () => {
       let societiesData: SocietyData[];
       
       // If user is a society admin, only fetch societies they administer
-      if (user?.role === 'society_admin' && user.id) {
+      if (user?.role === 'Society Admin' && user.id) {
         societiesData = await societyService.getAdministeredSocieties(user.id);
       } else {
         // For system admins and other roles, fetch all societies
@@ -539,7 +539,7 @@ const ManageResident: React.FC = () => {
                       name="society_id"
                       value={resident.society_id.toString()}
                       label="Society"
-                      disabled={user?.role === 'society_admin'}
+                      disabled={user?.role === 'Society Admin'}
                       onChange={(e) => handleChange(e as React.ChangeEvent<HTMLInputElement>)}
                     >
                       {societies.map((society) => (

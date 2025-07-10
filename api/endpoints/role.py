@@ -209,3 +209,52 @@ def remove_permission_from_role(
     except IntegrityError as e:
         db.rollback()
         raise HTTPException(status_code=400, detail=f"Database error: {str(e)}")
+
+
+@router.put("/roles/{role_id}/permissions", status_code=200)
+def update_role_permissions(
+    role_id: UUID,
+    permission_request: dict,  # Expecting {"permission_ids": [list of UUIDs]}
+    db: Session = Depends(get_db)
+):
+    """
+    Update all permissions for a role (bulk update).
+    This will replace all existing permissions for the role with the provided list.
+    """
+    # Validate role exists
+    role = db.query(models.Role).filter(models.Role.id == role_id).first()
+    if role is None:
+        raise HTTPException(status_code=404, detail="Role not found")
+    
+    # Get permission_ids from request body
+    permission_ids = permission_request.get("permission_ids", [])
+    
+    # Validate all permission IDs exist
+    if permission_ids:
+        valid_permissions = db.query(models.Permission).filter(
+            models.Permission.id.in_(permission_ids)
+        ).all()
+        
+        if len(valid_permissions) != len(permission_ids):
+            raise HTTPException(status_code=400, detail="One or more permission IDs are invalid")
+    
+    try:
+        # Remove all existing permissions for this role
+        db.query(models.RolePermission).filter(
+            models.RolePermission.role_id == role_id
+        ).delete()
+        
+        # Add new permissions
+        for permission_id in permission_ids:
+            role_permission = models.RolePermission(
+                role_id=role_id,
+                permission_id=UUID(permission_id)
+            )
+            db.add(role_permission)
+        
+        db.commit()
+        return {"message": f"Successfully updated {len(permission_ids)} permissions for role"}
+        
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=400, detail=f"Database error: {str(e)}")

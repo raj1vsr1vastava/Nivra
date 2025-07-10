@@ -54,6 +54,12 @@ const residentService = {
     return response.data;
   },
 
+  // Get resident by user ID
+  getResidentByUserId: async (userId: string): Promise<ResidentData> => {
+    const response = await apiClient.get(`/users/${userId}/resident`);
+    return response.data;
+  },
+
   // Get society residents
   getSocietyResidents: async (societyId: string | number): Promise<ResidentData[]> => {
     const response = await apiClient.get(`/societies/${societyId}/residents`);

@@ -147,7 +147,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         email: data.email,
         firstName: userData.firstName,
         lastName: userData.lastName,
-        role: 'resident', // New users are residents by default
+        role: 'Resident', // New users are residents by default
         userStatus: 'pending_society', // New users need to join a society
         avatar: null,
         societyId: null
